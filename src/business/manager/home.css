@@ -1,0 +1,36 @@
+/*
+ * Empty Stylesheet file.
+ */
+
+.button{
+    -fx-background-color: #4F91D3;
+    
+    -fx-text-fill: white;
+    -fx-font-weight: semi-bold;
+    -fx-alignment: baseline-left;
+    -fx-font: sans-serif;
+    -fx-font-size: 16;
+    -fx-label-padding: 5 0 0 0;
+    -fx-padding: 0 0 0 50;
+    -fx-border: none;
+    -fx-border-color: #4F91D3;
+   
+}
+.button:hover{
+    -fx-background-color: #4F91D3;
+}
+#header{
+    -fx-alignment: center;
+    -fx-font-size: 20;
+    -fx-text-alignment: center;
+    -fx-alignment: baseline-left;
+}
+
+#homepage-label{
+    -fx-font: arial;
+    -fx-font-size: 18;
+}
+
+.mainFxmlClass {
+
+}

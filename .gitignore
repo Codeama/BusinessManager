@@ -1,0 +1,18 @@
+
+# Created by https://www.gitignore.io/api/netbeans
+# Edit at https://www.gitignore.io/?templates=netbeans
+
+### NetBeans ###
+**/nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+#Others
+*.xml
+manifest.mf
+*.properties
+
+# End of https://www.gitignore.io/api/netbeans

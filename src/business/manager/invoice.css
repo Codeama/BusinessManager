@@ -1,0 +1,13 @@
+/*
+ * Empty Stylesheet file.
+ */
+
+.text-field{
+    -fx-background-color: white;
+    -fx-alignment: baseline-left;
+    -fx-border-style: solid;
+}
+
+.mainFxmlClass {
+
+}
