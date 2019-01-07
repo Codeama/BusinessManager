@@ -15,9 +15,9 @@ import javafx.fxml.Initializable;
  *
  * @author BUKOLA
  */
-public class HomeController implements Initializable, ScreenHandler {
+public class HomeController implements Initializable, ScreenChangeListener {
 
-    ScreenController screenController;
+    ScreenHandler screenController;
     /**
      * Initializes the controller class.
      */
@@ -27,7 +27,7 @@ public class HomeController implements Initializable, ScreenHandler {
     }    
 
     @Override
-    public void setParentScreen(ScreenController currentPage) {
+    public void setParentScreen(ScreenHandler currentPage) {
         screenController = currentPage;
     }
     

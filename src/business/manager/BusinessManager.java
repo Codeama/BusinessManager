@@ -27,7 +27,7 @@ public class BusinessManager extends Application {
     
     @Override
     public void start(Stage primaryStage) {
-        ScreenController screenController = new ScreenController();
+        ScreenHandler screenController = new ScreenHandler();
         screenController.loadScreen(homeID, homeFxml);
         screenController.loadScreen(invoiceID, invoiceFxml);
         
@@ -35,7 +35,7 @@ public class BusinessManager extends Application {
         
         Group root = new Group();
         root.getChildren().addAll(screenController);
-        Scene scene = new Scene(root, 780, 543);
+        Scene scene = new Scene(root, 1000, 650);
         
         primaryStage.setTitle("Business Account Manager");
         primaryStage.setScene(scene);

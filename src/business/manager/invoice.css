@@ -5,7 +5,13 @@
 .text-field{
     -fx-background-color: white;
     -fx-alignment: baseline-left;
+   
     -fx-border-style: solid;
+    
+}
+
+.label{
+    -fx-text-fill: black;
 }
 
 .mainFxmlClass {
