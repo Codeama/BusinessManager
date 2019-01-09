@@ -5,27 +5,32 @@
  */
 package business.manager;
 
+import java.math.BigDecimal;
+import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 /**
  *
  * @author BUKOLA
  */
 public class RateBean{
-    private SimpleStringProperty description;
-    private SimpleIntegerProperty price;
-    private SimpleIntegerProperty quantity;
-    private DoubleProperty total;
+    private StringProperty description;
+    private ObjectProperty price;
+    private ObjectProperty quantity;
+    private ObjectProperty total;
     
-    public RateBean(String description, Integer quantity, Integer price) {
+    public RateBean(String description, BigDecimal quantity, BigDecimal price) {
         this.description = new SimpleStringProperty(description);
-        this.price = new SimpleIntegerProperty(price);
-        this.quantity = new SimpleIntegerProperty(quantity);
+        this.price = new SimpleObjectProperty<>(price);
+        this.quantity = new SimpleObjectProperty<>(quantity);
             }
     
     public String getDescription(){
@@ -36,26 +41,27 @@ public class RateBean{
         this.description.set(description);
     }
 
-    public int getPrice(){
+    public Object getPrice(){
         return price.get();
     }
 
-    public void setPrice(Integer price){
+    public void setPrice(BigDecimal price){
         this.price.set(price);
     }
 
     
-    public int getQuantity(){
+    public Object getQuantity(){
         return quantity.get();
     }
 
-    public void setQuantity(Integer quantity){
+    public void setQuantity(BigDecimal quantity){
         this.quantity.set(quantity);
     }
     
-    public double getTotal(){
-        total = new SimpleDoubleProperty();
-        NumberBinding amount = quantity.multiply(price);
+    public Object getTotal(){
+        total = new SimpleObjectProperty();
+        total.bind(Bindings.multiply(getQuantity(), getPrice()));
+        //ObjectBinding<BigDecimal> amount = quantity.//.multiply(price);
         this.total.set(amount.getValue().doubleValue());
         return total.get();
     }
