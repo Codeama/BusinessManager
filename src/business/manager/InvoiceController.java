@@ -59,9 +59,9 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     @FXML private ListView listView;
     @FXML private TableView<RateBean> tableView;
     @FXML private TableColumn<RateBean, String> descriptionCol; 
-    @FXML private TableColumn<RateBean, Integer> amountCol;
-    @FXML private TableColumn<RateBean, Integer> priceCol;
-    @FXML private TableColumn<RateBean, Integer> quantityCol;
+    @FXML private TableColumn<RateBean, BigDecimal> amountCol;
+    @FXML private TableColumn<RateBean, BigDecimal> priceCol;
+    @FXML private TableColumn<RateBean, BigDecimal> quantityCol;
     @FXML private TextField flatRateDescription;
     @FXML private StackPane formStack;
     ObservableList<RateBean> content = FXCollections.observableArrayList();
@@ -73,7 +73,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     RateBean unitRate;
     RateBeanWrapper invoiceContent;
     
-    Double runningTotal = new Double(0);
+    BigDecimal runningTotal = new BigDecimal(0);
     /**
      * Initializes the controller class.
      */
@@ -154,7 +154,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             amountCol.setCellValueFactory(new PropertyValueFactory<>("total"));
             tableView.setItems(content);
             //display running total
-            runningTotal += unitRate.getTotal();
+            runningTotal = runningTotal.add(unitRate.getTotal());
             invoiceTotal.setText(String.valueOf(runningTotal));
 
             flatRateDescription.clear();
@@ -170,7 +170,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
             tableView.setItems(content);
             //display running total of invoice
-            runningTotal += unitRate.getTotal();
+            runningTotal = runningTotal.add(unitRate.getTotal());
             invoiceTotal.setText(String.valueOf(runningTotal));
 
             
@@ -183,12 +183,12 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     
     private void createFlatRateBean(){
         unitRate = new RateBean(flatRateDescription.getText(), 
-                    1, new Integer(flatRateAmount.getText()));
+                    BigDecimal.ONE, new BigDecimal(flatRateAmount.getText()));
     }
     
     private void createUnitRateBean(){
         unitRate = new RateBean(unitDescription.getText(), 
-                    new Integer(unitQuantity.getText()), new Integer(unitPrice.getText()));
+                    new BigDecimal(unitQuantity.getText()), new BigDecimal(unitPrice.getText()));
     }
     
     private void addToRunningTotal(){
@@ -203,7 +203,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     public void deleteSelection(){
         RateBean row = tableView.getSelectionModel().getSelectedItem();
         tableView.getItems().remove(row);
-        runningTotal -= row.getTotal();
+        runningTotal = runningTotal.add(unitRate.getTotal());
         invoiceTotal.setText(String.valueOf(runningTotal));
     }
     
