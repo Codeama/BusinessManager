@@ -23,9 +23,9 @@ import javafx.beans.property.StringProperty;
  */
 public class RateBean{
     private StringProperty description;
-    private ObjectProperty price;
-    private ObjectProperty quantity;
-    private ObjectProperty total;
+    private ObjectProperty<BigDecimal> price;
+    private ObjectProperty<BigDecimal> quantity;
+    private ObjectProperty<BigDecimal> total;
     
     public RateBean(String description, BigDecimal quantity, BigDecimal price) {
         this.description = new SimpleStringProperty(description);
@@ -41,7 +41,7 @@ public class RateBean{
         this.description.set(description);
     }
 
-    public Object getPrice(){
+    public BigDecimal getPrice(){
         return price.get();
     }
 
@@ -50,7 +50,7 @@ public class RateBean{
     }
 
     
-    public Object getQuantity(){
+    public BigDecimal getQuantity(){
         return quantity.get();
     }
 
@@ -58,12 +58,13 @@ public class RateBean{
         this.quantity.set(quantity);
     }
     
-    public Object getTotal(){
-        total = new SimpleObjectProperty();
-        total.bind(Bindings.multiply(getQuantity(), getPrice()));
+    public BigDecimal getTotal(){
+        total = new SimpleObjectProperty(new BigDecimal(0));
+        //total = quantity.getValue().multiply(price.getValue());
+        //total.bind(Bindings.multiply(getQuantity(), getPrice()));
         //ObjectBinding<BigDecimal> amount = quantity.//.multiply(price);
-        this.total.set(amount.getValue().doubleValue());
-        return total.get();
+        //this.total.set(amount.getValue().doubleValue());
+        return total.getValue();
     }
     
     
