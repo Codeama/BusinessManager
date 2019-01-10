@@ -6,6 +6,7 @@
 package business.manager;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.binding.ObjectBinding;
@@ -60,11 +61,15 @@ public class RateBean{
     
     public BigDecimal getTotal(){
         total = new SimpleObjectProperty(new BigDecimal(0));
-        //total = quantity.getValue().multiply(price.getValue());
-        //total.bind(Bindings.multiply(getQuantity(), getPrice()));
-        //ObjectBinding<BigDecimal> amount = quantity.//.multiply(price);
-        //this.total.set(amount.getValue().doubleValue());
-        return total.getValue();
+        ObjectBinding<BigDecimal> sumUp = new ObjectBinding(){
+            @Override
+            protected BigDecimal computeValue() {
+                return getQuantity().multiply(getPrice());
+            }
+        };
+        total.bind(sumUp);
+
+        return total.getValue().setScale(2, RoundingMode.HALF_UP);
     }
     
     
