@@ -15,7 +15,7 @@ import javafx.beans.property.SimpleObjectProperty;
  */
 public class InvoiceProperty {
     private SimpleObjectProperty<BigDecimal> invoiceTotal;
-    private BigDecimal totalProperty = new BigDecimal(0);
+    private BigDecimal total = new BigDecimal(0);
     
     public InvoiceProperty(){
         invoiceTotal = new SimpleObjectProperty(BigDecimal.ZERO);
@@ -24,32 +24,32 @@ public class InvoiceProperty {
     
     /**
      * 
-     * @param total is the total of each row item
+     * @param itemTotal is the itemTotal of each row item
      * @see RateBean#getTotal() 
-     * @return total value of an invoice
+     * @return itemTotal value of an invoice
      */
-    public BigDecimal getInvoiceTotal(BigDecimal total){
-        //total = bean.getTotal();
-        //this.itemTotal = new SimpleObjectProperty(total);
+    public BigDecimal addToInvoice(BigDecimal itemTotal){
         ObjectBinding<BigDecimal> sumTotal= new ObjectBinding(){
             @Override
             protected BigDecimal computeValue() {
-                totalProperty = totalProperty.add(total);
-                return totalProperty;
+                total = total.add(itemTotal);
+                return total;
             }
         };
         invoiceTotal.bind(sumTotal);
         return invoiceTotal.get();
     }
     
-//    public static void main(String[] args){
-//        InvoiceProperty invoice = new InvoiceProperty();
-//        BigDecimal total3= invoice.getInvoiceTotal(BigDecimal.ONE);
-//        System.out.println("First sum: "+ total3);
-//        BigDecimal total4= invoice.getInvoiceTotal(new BigDecimal(9));
-//        System.out.println("Second: "+ total4);
-//    }
-    
-    
+    public BigDecimal removeFromInvoice(BigDecimal itemTotal){
+        ObjectBinding<BigDecimal> subtractTotal = new ObjectBinding(){
+            @Override
+            protected BigDecimal computeValue() {
+                total = total.subtract(itemTotal);
+                return total;
+            }
+        };
+        invoiceTotal.bind(subtractTotal);
+        return invoiceTotal.get();
+    }
     
 }
