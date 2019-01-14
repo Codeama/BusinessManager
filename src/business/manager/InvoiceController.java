@@ -70,11 +70,10 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     ObservableList<String> flatComboItems = FXCollections.observableArrayList(
             "flat rate", "by hour", "by item");
     
-    FlatRateBean flatRate;
-    RateBean unitRate;
-    RateBeanWrapper invoiceContent;
+    RateBean rateBean;
+    InvoiceProperty invoice = new InvoiceProperty();
     
-    BigDecimal runningTotal = new BigDecimal(0);
+    
     /**
      * Initializes the controller class.
      */
@@ -120,18 +119,17 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             descriptionCol.setCellFactory(TextFieldTableCell.forTableColumn());
             
             //show totals concurrently
-            /**add listener to quantity too**/
+            /**add listener to quantity too!**/
             unitPrice.textProperty().addListener((obv, oldValue, newValue) ->{
                 unitTotal.setText("0.00");
                 if(!newValue.equals("")){
                    createUnitRateBean();
-                   //runningTotal += unitRate.getTotal();
-                   unitTotal.setText(String.valueOf(unitRate.getTotal()));
+                   unitTotal.setText(String.valueOf(rateBean.getTotal()));
                 }
             });
             
             //set default value for runningTotal
-            invoiceTotal.setText(String.valueOf(runningTotal.setScale(
+            invoiceTotal.setText(String.valueOf(BigDecimal.ZERO.setScale(
                     2, RoundingMode.HALF_UP)));
     }
     
@@ -146,17 +144,17 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     }
     
     @FXML
-    public void addToInvoice(){
+    public void addItem(){
         //if(!flatRateDescription.getText().equals("")){
         //identitfy flatRate form
         if(gridStack.getChildren().contains(flatRateGrid)){
             createFlatRateBean();
-            content.add(unitRate);
+            content.add(rateBean);
             descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
             priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
             amountCol.setCellValueFactory(new PropertyValueFactory<>("total"));
             tableView.setItems(content);
-            addToRunningTotal();
+            invoiceTotal.setText(String.valueOf(invoice.addToInvoice(rateBean.getTotal())));
 
             flatRateDescription.clear();
             flatRateAmount.clear();
@@ -164,13 +162,13 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         
         else  if(gridStack.getChildren().contains(unitGrid)){
             createUnitRateBean();
-            content.add(unitRate);
+            content.add(rateBean);
             descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
             amountCol.setCellValueFactory(new PropertyValueFactory<>("total"));
             quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
             priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
             tableView.setItems(content);
-            addToRunningTotal();
+            invoiceTotal.setText(String.valueOf(invoice.addToInvoice(rateBean.getTotal())));
 
             
             unitDescription.clear();
@@ -181,36 +179,23 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     }
     
     private void createFlatRateBean(){
-        unitRate = new RateBean(flatRateDescription.getText(), 
+        rateBean = new RateBean(flatRateDescription.getText(), 
                     BigDecimal.ONE, new BigDecimal(flatRateAmount.getText()));
     }
     
     private void createUnitRateBean(){
-        unitRate = new RateBean(unitDescription.getText(), 
+        rateBean = new RateBean(unitDescription.getText(), 
                     new BigDecimal(unitQuantity.getText()), new BigDecimal(unitPrice.getText()));
     }
     
-    private void addToRunningTotal(){
-        //compute and display running amount
-        runningTotal = runningTotal.add(unitRate.getTotal());
-        invoiceTotal.setText(String.valueOf(runningTotal));
-        
-    }
-    
-    private void subtractFromRunningTotal(BigDecimal value){
-        //subtract selection and display updated amount
-        runningTotal = runningTotal.subtract(value);
-        invoiceTotal.setText(String.valueOf(runningTotal));
-        
-    }
-    
     @FXML
-    public void deleteSelection(){
+    public void removeItem(){
         if(!tableView.getSelectionModel().isEmpty()){
             RateBean row = tableView.getSelectionModel().getSelectedItem();
             BigDecimal amount = row.getTotal();
             tableView.getItems().remove(row);
-            subtractFromRunningTotal(amount);
+            BigDecimal itemTotal = invoice.removeFromInvoice(amount);
+            invoiceTotal.setText(String.valueOf(itemTotal));
         }
     }
     
