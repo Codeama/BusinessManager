@@ -6,6 +6,7 @@
 package business.manager;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -119,17 +120,19 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             descriptionCol.setCellFactory(TextFieldTableCell.forTableColumn());
             
             //show totals concurrently
-            /**must validate Quantity field is not empty**/
+            /**add listener to quantity too**/
             unitPrice.textProperty().addListener((obv, oldValue, newValue) ->{
+                unitTotal.setText("0.00");
                 if(!newValue.equals("")){
                    createUnitRateBean();
                    //runningTotal += unitRate.getTotal();
                    unitTotal.setText(String.valueOf(unitRate.getTotal()));
                 }
             });
-
             
-            
+            //set default value for runningTotal
+            invoiceTotal.setText(String.valueOf(runningTotal.setScale(
+                    2, RoundingMode.HALF_UP)));
     }
     
     @Override
@@ -153,9 +156,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
             amountCol.setCellValueFactory(new PropertyValueFactory<>("total"));
             tableView.setItems(content);
-            //display running total
-            runningTotal = runningTotal.add(unitRate.getTotal());
-            invoiceTotal.setText(String.valueOf(runningTotal));
+            addToRunningTotal();
 
             flatRateDescription.clear();
             flatRateAmount.clear();
@@ -169,9 +170,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
             priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
             tableView.setItems(content);
-            //display running total of invoice
-            runningTotal = runningTotal.add(unitRate.getTotal());
-            invoiceTotal.setText(String.valueOf(runningTotal));
+            addToRunningTotal();
 
             
             unitDescription.clear();
@@ -192,19 +191,27 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     }
     
     private void addToRunningTotal(){
+        //compute and display running amount
+        runningTotal = runningTotal.add(unitRate.getTotal());
+        invoiceTotal.setText(String.valueOf(runningTotal));
         
     }
     
-    private void subtractFromRunningTotal(){
+    private void subtractFromRunningTotal(BigDecimal value){
+        //subtract selection and display updated amount
+        runningTotal = runningTotal.subtract(value);
+        invoiceTotal.setText(String.valueOf(runningTotal));
         
     }
     
     @FXML
     public void deleteSelection(){
-        RateBean row = tableView.getSelectionModel().getSelectedItem();
-        tableView.getItems().remove(row);
-        runningTotal = runningTotal.add(unitRate.getTotal());
-        invoiceTotal.setText(String.valueOf(runningTotal));
+        if(!tableView.getSelectionModel().isEmpty()){
+            RateBean row = tableView.getSelectionModel().getSelectedItem();
+            BigDecimal amount = row.getTotal();
+            tableView.getItems().remove(row);
+            subtractFromRunningTotal(amount);
+        }
     }
     
     //to be revisited; conflicting cell editing due to two different input grids

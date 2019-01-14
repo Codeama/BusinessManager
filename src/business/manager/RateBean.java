@@ -27,11 +27,14 @@ public class RateBean{
     private ObjectProperty<BigDecimal> price;
     private ObjectProperty<BigDecimal> quantity;
     private ObjectProperty<BigDecimal> total;
+    private ObjectProperty<BigDecimal> runningTotal;
     
     public RateBean(String description, BigDecimal quantity, BigDecimal price) {
         this.description = new SimpleStringProperty(description);
         this.price = new SimpleObjectProperty<>(price);
         this.quantity = new SimpleObjectProperty<>(quantity);
+        total = new SimpleObjectProperty(new BigDecimal(0));
+        runningTotal = new SimpleObjectProperty(BigDecimal.ZERO);
             }
     
     public String getDescription(){
@@ -60,17 +63,17 @@ public class RateBean{
     }
     
     public BigDecimal getTotal(){
-        total = new SimpleObjectProperty(new BigDecimal(0));
+        //total = new SimpleObjectProperty(new BigDecimal(0));
         ObjectBinding<BigDecimal> sumUp = new ObjectBinding(){
+            //{this.bind(quantity, price);} 
             @Override
             protected BigDecimal computeValue() {
-                return getQuantity().multiply(getPrice());
+                return quantity.get().multiply(price.get());
             }
         };
         total.bind(sumUp);
 
         return total.getValue().setScale(2, RoundingMode.HALF_UP);
     }
-    
     
 }
