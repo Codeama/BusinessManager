@@ -5,6 +5,8 @@
  */
 package business.manager;
 
+import invoice.RateBean;
+
 /**
  *
  * @author BUKOLA

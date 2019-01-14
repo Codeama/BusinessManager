@@ -18,7 +18,7 @@ import javafx.scene.layout.StackPane;
  * by the fxml file name, i.e.<String, Node>
  * @author BUKOLA
  */
-class ScreenHandler extends StackPane{
+public class ScreenHandler extends StackPane{
     private HashMap<String, Node> screens = new HashMap<>();
     
     public ScreenHandler(){
