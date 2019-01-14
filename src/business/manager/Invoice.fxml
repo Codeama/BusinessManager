@@ -185,7 +185,7 @@
                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <Button mnemonicParsing="false" onAction="#addToInvoice" prefHeight="32.0" prefWidth="71.0" text="Add item" GridPane.columnIndex="2">
+                                    <Button mnemonicParsing="false" onAction="#addItem" prefHeight="32.0" prefWidth="71.0" text="Add item" GridPane.columnIndex="2">
                                        <GridPane.margin>
                                           <Insets left="140.0" />
                                        </GridPane.margin>
@@ -196,7 +196,7 @@
                                           <Insets left="72.0" />
                                        </GridPane.margin>
                                     </TextField>
-                                    <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#deleteSelection" prefHeight="35.0" prefWidth="78.0" text="Delete item" GridPane.columnIndex="2" />
+                                    <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#removeItem" prefHeight="35.0" prefWidth="78.0" text="Delete item" GridPane.columnIndex="2" />
                                  </children>
                               </GridPane>
                            </children>
