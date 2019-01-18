@@ -19,7 +19,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -104,9 +103,6 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
                 computePriceChange(obv, oldValue, newValue));
             unitQuantity.textProperty().addListener((obv, oldValue, newValue)->
                 computeQuantityChange(obv, oldValue, newValue));
-
-            //validate user input
-            
     }
     
     
@@ -122,54 +118,86 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     
     @FXML
     public void addItem(){
-        //if(!flatRateDescription.getText().equals("")){
         //identitfy flatRate form
         if(formStack.getChildren().contains(flatRateForm)){
-           // if(rateBean == null)
-                createFlatRateBean();
+            createFlatRateBean();
+            loadFlatRateData();
+        }
+        
+        else  if(formStack.getChildren().contains(unitRateForm)){
+                  loadUnitRateData();
+        }
+    }
+    
+    private void createFlatRateBean(){
+        try{
+            rateBean = new RateBean(flatRateDescription.getText(), 
+                        BigDecimal.ONE, new BigDecimal(flatRateAmount.getText()));
+        }
+        catch(NumberFormatException exception){
+            flatRateAmount.setText("invalid");
+            flatRateAmount.requestFocus();
+            rateBean = null;
+        }
+    }
+    
+    private void createUnitRateBean(){
+        try{
+            rateBean = new RateBean(unitDescription.getText(), 
+                        new BigDecimal(unitQuantity.getText()),
+                        new BigDecimal(unitPrice.getText()));
+        }
+        catch(NumberFormatException exception){
+            unitQuantity.setText("invalid");
+            unitQuantity.requestFocus();
+            unitPrice.setText("invalid");
+            unitPrice.requestFocus();
+            rateBean = null;
+        }
+    }
+    
+    private void createDefaultQuantityBean(){
+        try{
+            rateBean = new RateBean(unitDescription.getText(), 
+                    BigDecimal.ONE, new BigDecimal(unitPrice.getText()));
+        }
+        catch(NumberFormatException exception){
+            unitPrice.setText("invalid");
+            unitPrice.requestFocus();
+            rateBean = null;
+        }
+    }
+    
+    private void loadFlatRateData(){
+        if(rateBean != null){ //null from exception handling @see createFlatRateBean()
             rowContent.add(rateBean);
             descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
             priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
             amountCol.setCellValueFactory(new PropertyValueFactory<>("total"));
             tableView.setItems(rowContent);
-            invoiceTotal.setText(currency.format(invoice.addToInvoice(rateBean.getTotal())));//String.valueOf(invoice.addToInvoice(rateBean.getTotal())));
-            
+            invoiceTotal.setText(currency.format(invoice.addToInvoice(rateBean.getTotal())));
             //clear flat rate form
             flatRateDescription.clear();
             flatRateAmount.clear();
-        }
-        
-        else  if(formStack.getChildren().contains(unitRateForm)){
-            //createUnitRateBean(); //if rateBean values are not null?
+
+        }   
+    }
+    
+    private void loadUnitRateData(){
+        if(rateBean != null){ //null from exception handling
             rowContent.add(rateBean);
             descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
             amountCol.setCellValueFactory(new PropertyValueFactory<>("total"));
             quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
             priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
             tableView.setItems(rowContent);
-            invoiceTotal.setText(currency.format(invoice.addToInvoice(rateBean.getTotal())));//String.valueOf(invoice.addToInvoice(rateBean.getTotal())));
-
+            invoiceTotal.setText(currency.format(invoice.addToInvoice(rateBean.getTotal())));
             //clear unit rate form
             unitDescription.clear();
             unitQuantity.clear();
             unitPrice.clear();
-            unitTotal.clear();
+            unitTotal.setText(currency.format(BigDecimal.ZERO));
         }
-    }
-    
-    private void createFlatRateBean(){
-        rateBean = new RateBean(flatRateDescription.getText(), 
-                    BigDecimal.ONE, new BigDecimal(flatRateAmount.getText()));
-    }
-    
-    private void createUnitRateBean(){
-        rateBean = new RateBean(unitDescription.getText(), 
-                    new BigDecimal(unitQuantity.getText()), new BigDecimal(unitPrice.getText()));
-    }
-    
-    private void createDefaultQuantityBean(){
-        rateBean = new RateBean(unitDescription.getText(), 
-                BigDecimal.ONE, new BigDecimal(unitPrice.getText()));
     }
     
     @FXML
@@ -208,38 +236,38 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             String oldPrice, String newPrice){
 
         setUnitTotalToZero();
-
-        if(unitQuantity.getText().equals("") & !newPrice.equals("")){
-            createDefaultQuantityBean();
-            unitTotal.setText(currency.format(rateBean.getTotal()));  
-        }
-        else if(newPrice.equals("") & unitQuantity.getText().equals("")){
-            setUnitTotalToZero();
-        }
-        //if they both contain values
-        if(!newPrice.equals("") & !unitQuantity.getText().equals("")){
-            createUnitRateBean();
-            unitTotal.setText(currency.format(rateBean.getTotal()));
-
-        }
+            if(unitQuantity.getText().equals("") & !newPrice.equals("")){
+                createDefaultQuantityBean();
+                if(rateBean != null)
+                unitTotal.setText(currency.format(rateBean.getTotal()));  
+            }
+            else if(newPrice.equals("") & unitQuantity.getText().equals("")){
+                setUnitTotalToZero();
+            }
+            //if they both contain values
+            else if(!newPrice.equals("") & !unitQuantity.getText().equals("")){
+                createUnitRateBean();
+                if(rateBean != null)
+                unitTotal.setText(currency.format(rateBean.getTotal()));
+            }
     }
 
     private void computeQuantityChange(ObservableValue<? extends String> obsValue, 
             String oldQuantity, String newQuantity){
 
         setUnitTotalToZero();
+            if(!newQuantity.equals("") & !unitPrice.getText().equals("")){
+                createUnitRateBean();
+                if(rateBean != null)
+               unitTotal.setText(currency.format(rateBean.getTotal()));
+            }
 
-        if(!newQuantity.equals("") & !unitPrice.getText().equals("")){
-            createUnitRateBean();
-           unitTotal.setText(currency.format(rateBean.getTotal()));
-        }
-        
-        if(newQuantity.equals("") & !unitPrice.getText().equals("")){
-           
-           createDefaultQuantityBean();
-           unitTotal.setText(currency.format(rateBean.getTotal()));
-        }
-        
+            if(newQuantity.equals("") & !unitPrice.getText().equals("")){
+
+               createDefaultQuantityBean();
+               if(rateBean != null)
+               unitTotal.setText(currency.format(rateBean.getTotal()));
+            }
     }
     
     private void setUnitTotalToZero(){
