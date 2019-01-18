@@ -127,9 +127,9 @@
                                   <TableColumn fx:id="amountCol" maxWidth="220.0" minWidth="100.0" prefWidth="217.0" text="Total" />
                                 </columns>
                               </TableView>
-                              <StackPane fx:id="gridStack" layoutY="260.0" prefHeight="29.0" prefWidth="780.0" AnchorPane.topAnchor="400.0">
+                              <StackPane fx:id="formStack" layoutY="260.0" prefHeight="29.0" prefWidth="780.0" AnchorPane.topAnchor="400.0">
                                  <children>
-                                    <GridPane fx:id="unitGrid" prefHeight="38.0" prefWidth="780.0">
+                                    <GridPane fx:id="unitRateForm" prefHeight="38.0" prefWidth="780.0">
                                       <columnConstraints>
                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="439.0" minWidth="10.0" prefWidth="381.0" />
                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="251.0" minWidth="10.0" prefWidth="202.0" />
@@ -156,7 +156,7 @@
                                           <TextField fx:id="unitTotal" editable="false" prefHeight="45.0" prefWidth="124.0" GridPane.columnIndex="3" />
                                        </children>
                                     </GridPane>
-                                    <GridPane fx:id="flatRateGrid" prefHeight="38.0" prefWidth="780.0">
+                                    <GridPane fx:id="flatRateForm" prefHeight="38.0" prefWidth="780.0">
                                       <columnConstraints>
                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="442.0" minWidth="10.0" prefWidth="433.0" />
                                         <ColumnConstraints fx:id="col1" hgrow="SOMETIMES" maxWidth="300.0" minWidth="10.0" prefWidth="196.0" />

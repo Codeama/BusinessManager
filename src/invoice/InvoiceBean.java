@@ -13,18 +13,18 @@ import javafx.beans.property.SimpleObjectProperty;
  *
  * @author BUKOLA
  */
-public class InvoiceProperty {
+public class InvoiceBean {
     private SimpleObjectProperty<BigDecimal> invoiceTotal;
     private BigDecimal total = new BigDecimal(0);
     
-    public InvoiceProperty(){
+    public InvoiceBean(){
         invoiceTotal = new SimpleObjectProperty(BigDecimal.ZERO);
         
     }
     
     /**
      * 
-     * @param itemTotal is the itemTotal of each row item
+     * @param itemTotal is the total of each row item
      * @see RateBean#getTotal() 
      * @return itemTotal value of an invoice
      */
