@@ -71,39 +71,127 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-            //initialize switch by flat rate from ComboBox
-            flatRateComboBox.setItems(flatComboItems);
-            flatRateComboBox.getSelectionModel().select("flat rate");
-            flatRateComboBox.getSelectionModel().selectedItemProperty()
-                    .addListener((obsValue, oldValue, newValue) -> 
-                            switchForm(obsValue, oldValue, newValue));            
+        //set flat rate combo items
+        flatRateComboBox.setItems(flatComboItems);
+        flatRateComboBox.getSelectionModel().select("flat rate");
+        //observe item selected changes
+        flatRateComboBox.getSelectionModel().selectedItemProperty()
+                .addListener((obsValue, oldValue, newValue) -> 
+                        switchForm(obsValue, oldValue, newValue));            
 
-            //initialize switch by hour/item from comboBox
-            unitComboBox.setItems(unitComboItems);
-            unitComboBox.getSelectionModel().select("by hour");
-            unitComboBox.getSelectionModel().selectedItemProperty()
-                    .addListener((obsValue, oldValue, newValue) -> 
-                            switchForm(obsValue, oldValue, newValue));
-            
-            //set description texfield for editing
-            descriptionCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        //set unit rate combo items
+        unitComboBox.setItems(unitComboItems);
+        unitComboBox.getSelectionModel().select("by hour");
+        //observe item selected changes
+        unitComboBox.getSelectionModel().selectedItemProperty()
+                .addListener((obsValue, oldValue, newValue) -> 
+                        switchForm(obsValue, oldValue, newValue));
 
-            //set default value for unit total
-            unitTotal.setText(currency.format(BigDecimal.ZERO.setScale(
-                    2, RoundingMode.HALF_UP)));
+        //set description texfield for editing
+        descriptionCol.setCellFactory(TextFieldTableCell.forTableColumn());
 
-            
-            //set default value for runningTotal
-            invoiceTotal.setText(currency.format(BigDecimal.ZERO.setScale(
-                    2, RoundingMode.HALF_UP))); 
-            
-            //compute total when values change
-            /**add listener to quantity too!**/
-            unitPrice.textProperty().addListener((obv, oldValue, newValue) ->
-                computePriceChange(obv, oldValue, newValue));
-            unitQuantity.textProperty().addListener((obv, oldValue, newValue)->
-                computeQuantityChange(obv, oldValue, newValue));
+        //set default value for unit total
+        unitTotal.setText(currency.format(BigDecimal.ZERO.setScale(
+                2, RoundingMode.HALF_UP)));
+
+        //set default value for runningTotal
+        invoiceTotal.setText(currency.format(BigDecimal.ZERO.setScale(
+                2, RoundingMode.HALF_UP))); 
+
+        //observe changes to price and quantity values
+        unitPrice.textProperty().addListener((obv, oldValue, newValue) ->
+            computePriceChange(obv, oldValue, newValue));
+        unitQuantity.textProperty().addListener((obv, oldValue, newValue)->
+            computeQuantityChange(obv, oldValue, newValue));
     }
+
+    
+    private void switchForm(ObservableValue<? extends String>
+            obsValue, String oldValue, String newValue){
+        
+        if(newValue.equals("by hour")){
+            copyDescriptionToUnitForm();
+            formStack.getChildren().removeAll(flatRateForm, unitRateForm);
+            formStack.getChildren().add(unitRateForm);
+            unitComboBox.getSelectionModel().select("by hour");
+        }
+        if(newValue.equals("by item")){
+            copyDescriptionToUnitForm();
+            formStack.getChildren().removeAll(flatRateForm, unitRateForm);
+            formStack.getChildren().add(unitRateForm);
+            unitComboBox.getSelectionModel().select("by item");
+        }
+
+        if(newValue.equals("flat rate")){
+            copyDescriptionToFlatForm();
+            formStack.getChildren().removeAll(flatRateForm, unitRateForm);
+            formStack.getChildren().add(flatRateForm);
+            flatRateComboBox.getSelectionModel().select("flat rate");
+        }
+    }
+    
+    private void copyDescriptionToUnitForm(){
+        //if flat rate description form has text, copy to unit rate description
+        if(!flatRateDescription.getText().equals("")){
+            unitDescription.setText(flatRateDescription.getText());
+            flatRateDescription.clear();
+            flatRateAmount.clear();
+        }
+    }
+    
+    private void copyDescriptionToFlatForm(){
+        if(!unitDescription.getText().equals("")){
+            flatRateDescription.setText(unitDescription.getText());
+            unitDescription.clear();
+            unitQuantity.clear();
+            unitPrice.clear();
+        }
+    }
+    
+    private void computePriceChange(ObservableValue<? extends String> obsValue, 
+            String oldPrice, String newPrice){
+
+        setUnitTotalToZero();
+            if(unitQuantity.getText().equals("") & !newPrice.equals("")){
+                createDefaultQuantityBean();
+                if(rateBean != null)
+                unitTotal.setText(currency.format(rateBean.getTotal()));  
+            }
+            else if(newPrice.equals("") & unitQuantity.getText().equals("")){
+                setUnitTotalToZero();
+            }
+            //if they both contain values
+            else if(!newPrice.equals("") & !unitQuantity.getText().equals("")){
+                createUnitRateBean();
+                if(rateBean != null)
+                unitTotal.setText(currency.format(rateBean.getTotal()));
+            }
+    }
+
+    private void computeQuantityChange(ObservableValue<? extends String> obsValue, 
+            String oldQuantity, String newQuantity){
+
+        setUnitTotalToZero();
+            if(!newQuantity.equals("") & !unitPrice.getText().equals("")){
+                createUnitRateBean();
+                if(rateBean != null)
+               unitTotal.setText(currency.format(rateBean.getTotal()));
+            }
+
+            if(newQuantity.equals("") & !unitPrice.getText().equals("")){
+
+               createDefaultQuantityBean();
+               if(rateBean != null)
+               unitTotal.setText(currency.format(rateBean.getTotal()));
+            }
+    }
+    
+    private void setUnitTotalToZero(){
+        unitTotal.setText(currency.format(BigDecimal.ZERO.setScale(
+            2, RoundingMode.HALF_UP)));
+
+    }
+
     
     
     @Override
@@ -211,70 +299,6 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         }
     }
     
-    private void switchForm(ObservableValue<? extends String>
-            obsValue, String oldValue, String newValue){
-        
-        if(newValue.equals("by hour")){
-            formStack.getChildren().removeAll(flatRateForm, unitRateForm);
-            formStack.getChildren().add(unitRateForm);
-            unitComboBox.getSelectionModel().select("by hour");
-        }
-        if(newValue.equals("by item")){
-            formStack.getChildren().removeAll(flatRateForm, unitRateForm);
-            formStack.getChildren().add(unitRateForm);
-            unitComboBox.getSelectionModel().select("by item");
-        }
-
-        if(newValue.equals("flat rate")){
-            formStack.getChildren().removeAll(flatRateForm, unitRateForm);
-            formStack.getChildren().add(flatRateForm);
-            flatRateComboBox.getSelectionModel().select("flat rate");
-        }
-    }
-    
-    private void computePriceChange(ObservableValue<? extends String> obsValue, 
-            String oldPrice, String newPrice){
-
-        setUnitTotalToZero();
-            if(unitQuantity.getText().equals("") & !newPrice.equals("")){
-                createDefaultQuantityBean();
-                if(rateBean != null)
-                unitTotal.setText(currency.format(rateBean.getTotal()));  
-            }
-            else if(newPrice.equals("") & unitQuantity.getText().equals("")){
-                setUnitTotalToZero();
-            }
-            //if they both contain values
-            else if(!newPrice.equals("") & !unitQuantity.getText().equals("")){
-                createUnitRateBean();
-                if(rateBean != null)
-                unitTotal.setText(currency.format(rateBean.getTotal()));
-            }
-    }
-
-    private void computeQuantityChange(ObservableValue<? extends String> obsValue, 
-            String oldQuantity, String newQuantity){
-
-        setUnitTotalToZero();
-            if(!newQuantity.equals("") & !unitPrice.getText().equals("")){
-                createUnitRateBean();
-                if(rateBean != null)
-               unitTotal.setText(currency.format(rateBean.getTotal()));
-            }
-
-            if(newQuantity.equals("") & !unitPrice.getText().equals("")){
-
-               createDefaultQuantityBean();
-               if(rateBean != null)
-               unitTotal.setText(currency.format(rateBean.getTotal()));
-            }
-    }
-    
-    private void setUnitTotalToZero(){
-        unitTotal.setText(currency.format(BigDecimal.ZERO.setScale(
-            2, RoundingMode.HALF_UP)));
-
-    }
     
     //to be revisited; conflicting cell editing due to two different input grids
 //    @FXML
