@@ -210,12 +210,14 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     @FXML
     public void addItem(){
         //identitfy flatRate form
-        if(formStack.getChildren().contains(flatRateForm)){
+        if(formStack.getChildren().contains(flatRateForm)
+                & !flatRateAmount.getText().equals("")){
             createFlatRateBean();
             loadFlatRateData();
         }
         
-        else  if(formStack.getChildren().contains(unitRateForm)){
+        else  if(formStack.getChildren().contains(unitRateForm)
+                & !unitPrice.getText().equals("")){
                   loadUnitRateData();
         }
     }
