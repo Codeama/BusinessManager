@@ -8,7 +8,6 @@ package invoice;
 import business.manager.BusinessManager;
 import business.manager.ScreenChangeListener;
 import business.manager.ScreenHandler;
-import static java.lang.String.format;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
@@ -28,7 +27,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
-import javafx.util.Callback;
 
 /**
  * FXML Controller class
@@ -74,36 +72,37 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        //set flat rate combo items
+        //=======ComboBox for Flat Rate Form==========
         flatRateComboBox.setItems(flatComboItems);
         flatRateComboBox.getSelectionModel().select("flat rate");
-        //observe item selected changes
+        //=======observe selection changes=======
         flatRateComboBox.getSelectionModel().selectedItemProperty()
                 .addListener((obsValue, oldValue, newValue) -> 
                         switchForm(obsValue, oldValue, newValue));            
 
-        //set unit rate combo items
+        //======ComboBox for Unit Rate Form======
         unitComboBox.setItems(unitComboItems);
         unitComboBox.getSelectionModel().select("by hour");
-        //observe item selected changes
+        //======observe selection changes========
         unitComboBox.getSelectionModel().selectedItemProperty()
                 .addListener((obsValue, oldValue, newValue) -> 
                         switchForm(obsValue, oldValue, newValue));
 
-        //set description texfield for editing
+        //=====Description TextField Editing======
         descriptionCol.setCellFactory(TextFieldTableCell.forTableColumn());
 
-        //set default value for unit total
+        //=====Unit Rate Form Total (default)=====
         unitTotal.setText(currency.format(BigDecimal.ZERO.setScale(
                 2, RoundingMode.HALF_UP)));
 
-        //set default value for runningTotal
+        //=====Invoice Running Total==============
         invoiceTotal.setText(currency.format(BigDecimal.ZERO.setScale(
                 2, RoundingMode.HALF_UP))); 
 
-        //observe changes to price and quantity values
+        //=====Price TextField for Unit Rate Form===
         unitPrice.textProperty().addListener((obv, oldValue, newValue) ->
             computePriceChange(obv, oldValue, newValue));
+        //=====Quantity TextField for Unit Rate Form==
         unitQuantity.textProperty().addListener((obv, oldValue, newValue)->
             computeQuantityChange(obv, oldValue, newValue));
     }
@@ -196,12 +195,13 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     }
 
     
-    
+    //===Menu NAVIGATION======
     @Override
     public void setParentScreen(ScreenHandler currentPage) {
         screenController = currentPage;
     }
     
+    //===Menu NAVIGATION======
     @FXML
     public void goToHome(){
         screenController.setScreen(BusinessManager.homeID);
@@ -221,6 +221,18 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
                   loadUnitRateData();
         }
     }
+    
+    @FXML
+    public void removeItem(){
+        if(!tableView.getSelectionModel().isEmpty()){
+            RateBean row = tableView.getSelectionModel().getSelectedItem();
+            BigDecimal amount = row.getTotal();
+            tableView.getItems().remove(row);
+            BigDecimal itemTotal = invoice.removeFromInvoice(amount);
+            invoiceTotal.setText(currency.format(itemTotal));//String.valueOf(itemTotal));
+        }
+    }
+
     
     private void createFlatRateBean(){
         try{
@@ -278,18 +290,6 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         }   
     }
     
-    private TableCell<RateBean, BigDecimal> addCurrency(){
-        TableCell<RateBean, BigDecimal> tableCell = new TableCell<RateBean, BigDecimal>(){
-            @Override
-            protected void updateItem(BigDecimal value, boolean empty){
-                super.updateItem(value, empty);
-                if (!empty) {
-                    setText(currency.format(value));
-                }
-            }
-        };
-        return tableCell;
-    }
     
     private void loadUnitRateData(){
         if(rateBean != null){ //null from exception handling
@@ -310,16 +310,20 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         }
     }
     
-    @FXML
-    public void removeItem(){
-        if(!tableView.getSelectionModel().isEmpty()){
-            RateBean row = tableView.getSelectionModel().getSelectedItem();
-            BigDecimal amount = row.getTotal();
-            tableView.getItems().remove(row);
-            BigDecimal itemTotal = invoice.removeFromInvoice(amount);
-            invoiceTotal.setText(currency.format(itemTotal));//String.valueOf(itemTotal));
+    private TableCell<RateBean, BigDecimal> addCurrency(){
+    TableCell<RateBean, BigDecimal> tableCell = new TableCell<RateBean, BigDecimal>(){
+        @Override
+        protected void updateItem(BigDecimal value, boolean empty){
+            super.updateItem(value, empty);
+            if (!empty) {
+                setText(currency.format(value));
+            }
         }
-    }
+    };
+    return tableCell;
+}
+
+    
     
     
     //to be revisited; conflicting cell editing due to two different input grids
