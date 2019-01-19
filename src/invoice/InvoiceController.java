@@ -8,6 +8,7 @@ package invoice;
 import business.manager.BusinessManager;
 import business.manager.ScreenChangeListener;
 import business.manager.ScreenHandler;
+import static java.lang.String.format;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
@@ -19,6 +20,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -26,6 +28,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.util.Callback;
 
 /**
  * FXML Controller class
@@ -262,6 +265,8 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
             priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
             amountCol.setCellValueFactory(new PropertyValueFactory<>("total"));
+            amountCol.setCellFactory(tableColumn -> addCurrency());
+            priceCol.setCellFactory(tableColumn -> addCurrency());
             tableView.setItems(rowContent);
             invoiceTotal.setText(currency.format(invoice.addToInvoice(rateBean.getTotal())));
             //clear flat rate form
@@ -271,6 +276,19 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         }   
     }
     
+    private TableCell<RateBean, BigDecimal> addCurrency(){
+        TableCell<RateBean, BigDecimal> tableCell = new TableCell<RateBean, BigDecimal>(){
+            @Override
+            protected void updateItem(BigDecimal value, boolean empty){
+                super.updateItem(value, empty);
+                if (!empty) {
+                    setText(currency.format(value));
+                }
+            }
+        };
+        return tableCell;
+    }
+    
     private void loadUnitRateData(){
         if(rateBean != null){ //null from exception handling
             rowContent.add(rateBean);
@@ -278,6 +296,8 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             amountCol.setCellValueFactory(new PropertyValueFactory<>("total"));
             quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
             priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
+            priceCol.setCellFactory(tableColumn -> addCurrency());
+            amountCol.setCellFactory(tableColumn -> addCurrency());
             tableView.setItems(rowContent);
             invoiceTotal.setText(currency.format(invoice.addToInvoice(rateBean.getTotal())));
             //clear unit rate form
