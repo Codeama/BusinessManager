@@ -88,7 +88,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
                 .addListener((obsValue, oldValue, newValue) -> 
                         switchForm(obsValue, oldValue, newValue));
 
-        //=====Description TextField Editing======
+        //=====Description TextField editing mode====
         descriptionCol.setCellFactory(TextFieldTableCell.forTableColumn());
 
         //=====Unit Rate Form Total (default)=====
@@ -99,10 +99,10 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         invoiceTotal.setText(currency.format(BigDecimal.ZERO.setScale(
                 2, RoundingMode.HALF_UP))); 
 
-        //=====Price TextField for Unit Rate Form===
+        //=====for changes in Price TextField for Unit Rate Form===
         unitPrice.textProperty().addListener((obv, oldValue, newValue) ->
             computePriceChange(obv, oldValue, newValue));
-        //=====Quantity TextField for Unit Rate Form==
+        //=====for changes in Quantity TextField for Unit Rate Form==
         unitQuantity.textProperty().addListener((obv, oldValue, newValue)->
             computeQuantityChange(obv, oldValue, newValue));
     }
