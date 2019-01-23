@@ -6,8 +6,10 @@
 package invoice;
 
 import business.manager.BusinessManager;
+import business.manager.Document_Creation;
 import business.manager.ScreenChangeListener;
 import business.manager.ScreenHandler;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
@@ -64,6 +66,8 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     private RateBean rateBean = null;
     private InvoiceBean invoice = new InvoiceBean();
     private NumberFormat currency = NumberFormat.getCurrencyInstance();
+    
+    private Document_Creation document = new Document_Creation();
     
     
     
@@ -174,18 +178,19 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             String oldQuantity, String newQuantity){
 
         setUnitTotalToZero();
-            if(!newQuantity.equals("") & !unitPrice.getText().equals("")){
-                createUnitRateBean();
-                if(rateBean != null)
-               unitTotal.setText(currency.format(rateBean.getTotal()));
-            }
+        
+        if(!newQuantity.equals("") & !unitPrice.getText().equals("")){
+            createUnitRateBean();
+            if(rateBean != null)
+           unitTotal.setText(currency.format(rateBean.getTotal()));
+        }
 
-            if(newQuantity.equals("") & !unitPrice.getText().equals("")){
+        if(newQuantity.equals("") & !unitPrice.getText().equals("")){
 
-               createDefaultQuantityBean();
-               if(rateBean != null)
-               unitTotal.setText(currency.format(rateBean.getTotal()));
-            }
+           createDefaultQuantityBean();
+           if(rateBean != null)
+           unitTotal.setText(currency.format(rateBean.getTotal()));
+        }
     }
     
     private void setUnitTotalToZero(){
@@ -232,6 +237,24 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             invoiceTotal.setText(currency.format(itemTotal));//String.valueOf(itemTotal));
         }
     }
+    
+    @FXML
+    public void saveAsPDF() throws IOException{
+        ObservableList<RateBean> text = tableView.getItems();
+        StringBuilder content = new StringBuilder();
+        text.forEach((item) -> {
+            System.out.printf("%s \t %s \t %s \t %s%n", item.getDescription(),
+                    item.getQuantity(), item.getPrice(), item.getTotal());
+            content.append(item.getDescription());
+            content.append(" ");
+            content.append(item.getQuantity());
+            content.append(" ");
+            //content.append(currency);
+            content.append(currency.format(item.getPrice()));
+            content.append(item.getTotal());
+        });
+        document.createDocument(content.toString());
+    }
 
     
     private void createFlatRateBean(){
@@ -242,6 +265,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         catch(NumberFormatException exception){
             flatRateAmount.setText("invalid");
             flatRateAmount.requestFocus();
+            flatRateAmount.onMousePressedProperty().set(event -> flatRateAmount.setText(""));
             rateBean = null;
         }
     }
@@ -253,10 +277,16 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
                         new BigDecimal(unitPrice.getText()));
         }
         catch(NumberFormatException exception){
-            unitQuantity.setText("invalid");
-            unitQuantity.requestFocus();
-            unitPrice.setText("invalid");
-            unitPrice.requestFocus();
+            if(!unitQuantity.getText().equals("")){
+                unitQuantity.setText("invalid");
+                unitQuantity.requestFocus();
+                unitQuantity.onMouseClickedProperty().set(event -> unitQuantity.setText(""));
+            }
+            if(!unitPrice.getText().equals("")){
+                unitPrice.setText("invalid");
+                unitPrice.requestFocus();
+                unitPrice.onMouseClickedProperty().set(event -> unitPrice.setText(""));
+            }
             rateBean = null;
         }
     }
@@ -269,6 +299,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         catch(NumberFormatException exception){
             unitPrice.setText("invalid");
             unitPrice.requestFocus();
+            unitPrice.onMouseClickedProperty().set(event -> unitPrice.setText(""));
             rateBean = null;
         }
     }
