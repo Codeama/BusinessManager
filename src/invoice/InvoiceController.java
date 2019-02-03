@@ -6,7 +6,6 @@
 package invoice;
 
 import business.manager.BusinessManager;
-import business.manager.Document_Creation;
 import business.manager.ScreenChangeListener;
 import business.manager.ScreenHandler;
 import java.io.IOException;
@@ -14,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.text.NumberFormat;
+import java.util.Iterator;
 import java.util.ResourceBundle;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -21,6 +21,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -29,6 +30,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import rst.pdfbox.layout.elements.Paragraph;
+import rst.pdfbox.layout.text.BaseFont;
+import rst.pdfbox.layout.text.Indent;
+import rst.pdfbox.layout.text.SpaceUnit;
 
 /**
  * FXML Controller class
@@ -39,6 +45,26 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
 
     ScreenHandler screenController;
     ScreenHandler invoiceGridController = new ScreenHandler();
+    @FXML
+    private TextField clientName;
+
+    @FXML
+    private TextField clientAddress;
+
+    @FXML
+    private TextField clientCity;
+
+    @FXML
+    private TextField clientPostCode;
+
+    @FXML
+    private TextField invoiceNo;
+
+    @FXML
+    private DatePicker invoiceDate;
+
+    @FXML
+    private DatePicker invoiceDueDate;
     @FXML private StackPane formStack;
     @FXML private GridPane flatRateForm;
     @FXML private GridPane unitRateForm;
@@ -67,7 +93,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     private InvoiceBean invoice = new InvoiceBean();
     private NumberFormat currency = NumberFormat.getCurrencyInstance();
     
-    private Document_Creation document = new Document_Creation();
+    private InvoicePDF document = new InvoicePDF();
     
     
     
@@ -76,6 +102,8 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        //clientCity.setPromptText("City");
+        
         //=======ComboBox for Flat Rate Form==========
         flatRateComboBox.setItems(flatComboItems);
         flatRateComboBox.getSelectionModel().select("flat rate");
@@ -240,22 +268,74 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     
     @FXML
     public void saveAsPDF() throws IOException{
+        final StringBuilder content = new StringBuilder();
+        
+        String sender = "94 Willmore Road, Birmingham B20 3JJ";
+        StringBuilder receiver = new StringBuilder();
+        StringBuilder invoiceDetails = new StringBuilder();
+        receiver.append(clientName.getText());
+        receiver.append(System.lineSeparator());
+        receiver.append(clientAddress.getText());
+        
+        invoiceDetails.append(invoiceNo.getText());
+        invoiceDetails.append(System.lineSeparator());
+        invoiceDetails.append("23/01/2019");
+        
         ObservableList<RateBean> text = tableView.getItems();
-        StringBuilder content = new StringBuilder();
+        //Iterator textIterator = text.iterator();
+        //while(textIterator.hasNext()){
+        //StringBuilder content = new StringBuilder();
         text.forEach((item) -> {
             System.out.printf("%s \t %s \t %s \t %s%n", item.getDescription(),
                     item.getQuantity(), item.getPrice(), item.getTotal());
             content.append(item.getDescription());
-            content.append(" ");
+            content.append("      ");
             content.append(item.getQuantity());
-            content.append(" ");
+            content.append("      ");
             //content.append(currency);
             content.append(currency.format(item.getPrice()));
             content.append(item.getTotal());
+            content.append(System.lineSeparator());
         });
-        document.createDocument(content.toString());
-    }
+        System.out.println(content.toString());
 
+        
+        document.createDocument(sender, receiver.toString(), invoiceDetails.toString(), content.toString());
+        
+//        ObservableList<RateBean> text = tableView.getItems();
+//        Iterator textIterator = text.iterator();
+//        //while(textIterator.hasNext()){
+//        //StringBuilder content = new StringBuilder();
+//        text.forEach((item) -> {
+//            System.out.printf("%s \t %s \t %s \t %s%n", item.getDescription(),
+//                    item.getQuantity(), item.getPrice(), item.getTotal());
+//            content.append(item.getDescription());
+//            content.append(" ");
+//            content.append(item.getQuantity());
+//            content.append(" ");
+//            //content.append(currency);
+//            content.append(currency.format(item.getPrice()));
+//            content.append(item.getTotal());
+//        });
+//        System.out.println(content.toString());
+        //}
+//        document.createDocument(content.toString());
+    }
+    
+    private void addInvoiceItems() throws IOException{
+        Paragraph paragraph = new Paragraph();
+        paragraph.add(new Indent("DESCRIPTION", 170, SpaceUnit.pt, 11, PDType1Font.HELVETICA_BOLD));
+        paragraph.addText("QUANTITY     ", 11, PDType1Font.HELVETICA_BOLD);
+        paragraph.addMarkup("       ", 11, BaseFont.Helvetica);
+        paragraph.addMarkup("       ", 11, BaseFont.Helvetica);
+        paragraph.addMarkup("       ", 11, BaseFont.Helvetica);
+        paragraph.addText("PRICE        ", 11, PDType1Font.HELVETICA_BOLD);
+        paragraph.addMarkup("       ", 11, BaseFont.Helvetica);
+        paragraph.addMarkup("       ", 11, BaseFont.Helvetica);
+        paragraph.addMarkup("       ", 11, BaseFont.Helvetica);
+        paragraph.addMarkup("*TOTAL*", 11, BaseFont.Helvetica);
+
+    }
     
     private void createFlatRateBean(){
         try{
