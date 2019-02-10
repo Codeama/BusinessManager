@@ -10,8 +10,19 @@ dist/
 nbdist/
 .nb-gradle/
 
+##Java DB files ##
+*.dat
+*.ctrl
+*.lck
+*.log
+
+##PDFbox template files for testing##
+*.pdf
+
 #Others
 *.xml
+*.txt
+
 manifest.mf
 *.properties
 
