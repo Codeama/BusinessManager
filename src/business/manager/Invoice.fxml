@@ -71,18 +71,18 @@
                                 </rowConstraints>
                                  <children>
                                     <Label prefHeight="41.0" prefWidth="78.0" stylesheets="@invoice.css" text="Bill to:" />
-                                    <TextField promptText="Client name" GridPane.columnIndex="1">
+                                    <TextField fx:id="clientName" promptText="Client name" GridPane.columnIndex="1">
                                        <opaqueInsets>
                                           <Insets />
                                        </opaqueInsets>
                                     </TextField>
-                                    <TextField promptText="Address" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                    <TextField prefHeight="31.0" prefWidth="131.0" promptText="City" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                    <TextField fx:id="clientAddress" promptText="Address" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <TextField fx:id="clientCity" prefHeight="31.0" prefWidth="131.0" promptText="City" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                        <GridPane.margin>
                                           <Insets right="150.0" />
                                        </GridPane.margin>
                                     </TextField>
-                                    <TextField prefHeight="27.0" prefWidth="159.0" promptText="Post code" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                    <TextField fx:id="clientPostCode" prefHeight="27.0" prefWidth="159.0" promptText="Post code" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                        <GridPane.margin>
                                           <Insets left="200.0" />
                                        </GridPane.margin>
@@ -97,17 +97,17 @@
                                           <Insets left="50.0" />
                                        </GridPane.margin>
                                     </Label>
-                                    <TextField prefHeight="31.0" prefWidth="151.0" GridPane.columnIndex="3">
+                                    <TextField fx:id="invoiceNo" prefHeight="31.0" prefWidth="151.0" GridPane.columnIndex="3">
                                        <GridPane.margin>
                                           <Insets right="50.0" />
                                        </GridPane.margin>
                                     </TextField>
-                                    <DatePicker GridPane.columnIndex="3" GridPane.rowIndex="1">
+                                    <DatePicker fx:id="invoiceDate" GridPane.columnIndex="3" GridPane.rowIndex="1">
                                        <GridPane.margin>
                                           <Insets right="50.0" />
                                        </GridPane.margin>
                                     </DatePicker>
-                                    <DatePicker GridPane.columnIndex="3" GridPane.rowIndex="2">
+                                    <DatePicker fx:id="invoiceDueDate" GridPane.columnIndex="3" GridPane.rowIndex="2">
                                        <GridPane.margin>
                                           <Insets right="50.0" />
                                        </GridPane.margin>
@@ -176,8 +176,8 @@
                               <GridPane layoutY="452.0" prefHeight="186.0" prefWidth="780.0" AnchorPane.bottomAnchor="18.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="440.0">
                                 <columnConstraints>
                                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="298.0" minWidth="10.0" prefWidth="298.0" />
-                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="387.0" minWidth="10.0" prefWidth="271.0" />
-                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="290.0" minWidth="10.0" prefWidth="211.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="387.0" minWidth="10.0" prefWidth="263.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="290.0" minWidth="10.0" prefWidth="219.0" />
                                 </columnConstraints>
                                 <rowConstraints>
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -185,18 +185,26 @@
                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <Button mnemonicParsing="false" onAction="#addItem" prefHeight="32.0" prefWidth="71.0" text="Add item" GridPane.columnIndex="2">
+                                    <Button mnemonicParsing="false" onAction="#addItem" prefHeight="31.0" prefWidth="79.0" text="Add item" GridPane.columnIndex="2">
                                        <GridPane.margin>
-                                          <Insets left="140.0" />
+                                          <Insets left="150.0" />
                                        </GridPane.margin>
                                     </Button>
-                                    <Button mnemonicParsing="false" text="Total:" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                    <TextField fx:id="invoiceTotal" editable="false" prefHeight="27.0" prefWidth="141.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                    <TextField fx:id="invoiceTotal" editable="false" prefHeight="27.0" prefWidth="128.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
                                        <GridPane.margin>
-                                          <Insets left="72.0" />
+                                          <Insets left="77.0" />
                                        </GridPane.margin>
                                     </TextField>
                                     <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#removeItem" prefHeight="35.0" prefWidth="78.0" text="Delete item" GridPane.columnIndex="2" />
+                                    <Button mnemonicParsing="false" onAction="#saveAsPDF" text="Save" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <Label alignment="CENTER_RIGHT" graphicTextGap="5.0" prefHeight="31.0" prefWidth="47.0" text="TOTAL:" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                       <GridPane.margin>
+                                          <Insets left="28.0" />
+                                       </GridPane.margin>
+                                       <padding>
+                                          <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                       </padding>
+                                    </Label>
                                  </children>
                               </GridPane>
                            </children>
