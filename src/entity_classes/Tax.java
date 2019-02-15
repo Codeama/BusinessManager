@@ -31,12 +31,12 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "Tax.findByWeekEnding", query = "SELECT t FROM Tax t WHERE t.weekEnding = :weekEnding")
     , @NamedQuery(name = "Tax.findByIncome", query = "SELECT t FROM Tax t WHERE t.income = :income")
     , @NamedQuery(name = "Tax.findByExpenses", query = "SELECT t FROM Tax t WHERE t.expenses = :expenses")
-    , @NamedQuery(name = "Tax.findByEarnings", query = "SELECT t FROM Tax t WHERE t.earnings = :earnings")
+    , @NamedQuery(name = "Tax.findByProfit", query = "SELECT t FROM Tax t WHERE t.profit = :profit")
     , @NamedQuery(name = "Tax.findByNi2", query = "SELECT t FROM Tax t WHERE t.ni2 = :ni2")
     , @NamedQuery(name = "Tax.findByNi4", query = "SELECT t FROM Tax t WHERE t.ni4 = :ni4")
     , @NamedQuery(name = "Tax.findByIncomeTax", query = "SELECT t FROM Tax t WHERE t.incomeTax = :incomeTax")
     , @NamedQuery(name = "Tax.findByTotal", query = "SELECT t FROM Tax t WHERE t.total = :total")
-    , @NamedQuery(name = "Tax.findByRunningtotal", query = "SELECT t FROM Tax t WHERE t.runningtotal = :runningtotal")})
+    , @NamedQuery(name = "Tax.findByRunningTotal", query = "SELECT t FROM Tax t WHERE t.runningTotal = :runningTotal")})
 public class Tax implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -53,8 +53,8 @@ public class Tax implements Serializable {
     @Column(name = "EXPENSES")
     private BigDecimal expenses;
     @Basic(optional = false)
-    @Column(name = "EARNINGS")
-    private BigDecimal earnings;
+    @Column(name = "PROFIT")
+    private BigDecimal profit;
     @Basic(optional = false)
     @Column(name = "NI2")
     private BigDecimal ni2;
@@ -68,8 +68,8 @@ public class Tax implements Serializable {
     @Column(name = "TOTAL")
     private BigDecimal total;
     @Basic(optional = false)
-    @Column(name = "RUNNINGTOTAL")
-    private BigDecimal runningtotal;
+    @Column(name = "RUNNING_TOTAL")
+    private BigDecimal runningTotal;
 
     public Tax() {
     }
@@ -78,16 +78,16 @@ public class Tax implements Serializable {
         this.weekEnding = weekEnding;
     }
 
-    public Tax(Date weekEnding, BigDecimal income, BigDecimal expenses, BigDecimal earnings, BigDecimal ni2, BigDecimal ni4, BigDecimal incomeTax, BigDecimal total, BigDecimal runningtotal) {
+    public Tax(Date weekEnding, BigDecimal income, BigDecimal expenses, BigDecimal profit, BigDecimal ni2, BigDecimal ni4, BigDecimal incomeTax, BigDecimal total, BigDecimal runningTotal) {
         this.weekEnding = weekEnding;
         this.income = income;
         this.expenses = expenses;
-        this.earnings = earnings;
+        this.profit = profit;
         this.ni2 = ni2;
         this.ni4 = ni4;
         this.incomeTax = incomeTax;
         this.total = total;
-        this.runningtotal = runningtotal;
+        this.runningTotal = runningTotal;
     }
 
     public Date getWeekEnding() {
@@ -114,12 +114,12 @@ public class Tax implements Serializable {
         this.expenses = expenses;
     }
 
-    public BigDecimal getEarnings() {
-        return earnings;
+    public BigDecimal getProfit() {
+        return profit;
     }
 
-    public void setEarnings(BigDecimal earnings) {
-        this.earnings = earnings;
+    public void setProfit(BigDecimal profit) {
+        this.profit = profit;
     }
 
     public BigDecimal getNi2() {
@@ -154,12 +154,12 @@ public class Tax implements Serializable {
         this.total = total;
     }
 
-    public BigDecimal getRunningtotal() {
-        return runningtotal;
+    public BigDecimal getRunningTotal() {
+        return runningTotal;
     }
 
-    public void setRunningtotal(BigDecimal runningtotal) {
-        this.runningtotal = runningtotal;
+    public void setRunningTotal(BigDecimal runningTotal) {
+        this.runningTotal = runningTotal;
     }
 
     @Override

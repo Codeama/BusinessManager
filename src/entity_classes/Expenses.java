@@ -6,6 +6,7 @@
 package entity_classes;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -33,7 +34,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "Expenses.findByCategory", query = "SELECT e FROM Expenses e WHERE e.category = :category")
     , @NamedQuery(name = "Expenses.findByReceipt", query = "SELECT e FROM Expenses e WHERE e.receipt = :receipt")
     , @NamedQuery(name = "Expenses.findByTotal", query = "SELECT e FROM Expenses e WHERE e.total = :total")
-    , @NamedQuery(name = "Expenses.findByRunningtotal", query = "SELECT e FROM Expenses e WHERE e.runningtotal = :runningtotal")})
+    , @NamedQuery(name = "Expenses.findByRunningTotal", query = "SELECT e FROM Expenses e WHERE e.runningTotal = :runningTotal")})
 public class Expenses implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -52,12 +53,13 @@ public class Expenses implements Serializable {
     private String category;
     @Column(name = "RECEIPT")
     private String receipt;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @Column(name = "TOTAL")
-    private long total;
+    private BigDecimal total;
     @Basic(optional = false)
-    @Column(name = "RUNNINGTOTAL")
-    private long runningtotal;
+    @Column(name = "RUNNING_TOTAL")
+    private BigDecimal runningTotal;
 
     public Expenses() {
     }
@@ -66,12 +68,12 @@ public class Expenses implements Serializable {
         this.id = id;
     }
 
-    public Expenses(Integer id, Date date, String description, long total, long runningtotal) {
+    public Expenses(Integer id, Date date, String description, BigDecimal total, BigDecimal runningTotal) {
         this.id = id;
         this.date = date;
         this.description = description;
         this.total = total;
-        this.runningtotal = runningtotal;
+        this.runningTotal = runningTotal;
     }
 
     public Integer getId() {
@@ -114,20 +116,20 @@ public class Expenses implements Serializable {
         this.receipt = receipt;
     }
 
-    public long getTotal() {
+    public BigDecimal getTotal() {
         return total;
     }
 
-    public void setTotal(long total) {
+    public void setTotal(BigDecimal total) {
         this.total = total;
     }
 
-    public long getRunningtotal() {
-        return runningtotal;
+    public BigDecimal getRunningTotal() {
+        return runningTotal;
     }
 
-    public void setRunningtotal(long runningtotal) {
-        this.runningtotal = runningtotal;
+    public void setRunningTotal(BigDecimal runningTotal) {
+        this.runningTotal = runningTotal;
     }
 
     @Override

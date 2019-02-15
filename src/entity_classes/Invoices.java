@@ -6,17 +6,24 @@
 package entity_classes;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -29,10 +36,10 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Invoices.findAll", query = "SELECT i FROM Invoices i")
     , @NamedQuery(name = "Invoices.findByDate", query = "SELECT i FROM Invoices i WHERE i.date = :date")
     , @NamedQuery(name = "Invoices.findByInvoiceNo", query = "SELECT i FROM Invoices i WHERE i.invoiceNo = :invoiceNo")
-    , @NamedQuery(name = "Invoices.findByFilepath", query = "SELECT i FROM Invoices i WHERE i.filepath = :filepath")
+    , @NamedQuery(name = "Invoices.findByFilePath", query = "SELECT i FROM Invoices i WHERE i.filePath = :filePath")
     , @NamedQuery(name = "Invoices.findByStatus", query = "SELECT i FROM Invoices i WHERE i.status = :status")
     , @NamedQuery(name = "Invoices.findByTotal", query = "SELECT i FROM Invoices i WHERE i.total = :total")
-    , @NamedQuery(name = "Invoices.findByRunningtotal", query = "SELECT i FROM Invoices i WHERE i.runningtotal = :runningtotal")})
+    , @NamedQuery(name = "Invoices.findByRunningTotal", query = "SELECT i FROM Invoices i WHERE i.runningTotal = :runningTotal")})
 public class Invoices implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -45,17 +52,23 @@ public class Invoices implements Serializable {
     @Column(name = "INVOICE_NO")
     private String invoiceNo;
     @Basic(optional = false)
-    @Column(name = "FILEPATH")
-    private String filepath;
+    @Column(name = "FILE_PATH")
+    private String filePath;
     @Basic(optional = false)
     @Column(name = "STATUS")
     private String status;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @Column(name = "TOTAL")
-    private long total;
+    private BigDecimal total;
     @Basic(optional = false)
-    @Column(name = "RUNNINGTOTAL")
-    private long runningtotal;
+    @Column(name = "RUNNING_TOTAL")
+    private BigDecimal runningTotal;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "invoiceNo")
+    private Collection<InvoiceItems> invoiceItemsCollection;
+    @JoinColumn(name = "CUSTOMER_ID", referencedColumnName = "CUSTOMER_ID")
+    @ManyToOne(optional = false)
+    private Customers customerId;
 
     public Invoices() {
     }
@@ -64,13 +77,13 @@ public class Invoices implements Serializable {
         this.invoiceNo = invoiceNo;
     }
 
-    public Invoices(String invoiceNo, Date date, String filepath, String status, long total, long runningtotal) {
+    public Invoices(String invoiceNo, Date date, String filePath, String status, BigDecimal total, BigDecimal runningTotal) {
         this.invoiceNo = invoiceNo;
         this.date = date;
-        this.filepath = filepath;
+        this.filePath = filePath;
         this.status = status;
         this.total = total;
-        this.runningtotal = runningtotal;
+        this.runningTotal = runningTotal;
     }
 
     public Date getDate() {
@@ -89,12 +102,12 @@ public class Invoices implements Serializable {
         this.invoiceNo = invoiceNo;
     }
 
-    public String getFilepath() {
-        return filepath;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public void setFilepath(String filepath) {
-        this.filepath = filepath;
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     public String getStatus() {
@@ -105,20 +118,37 @@ public class Invoices implements Serializable {
         this.status = status;
     }
 
-    public long getTotal() {
+    public BigDecimal getTotal() {
         return total;
     }
 
-    public void setTotal(long total) {
+    public void setTotal(BigDecimal total) {
         this.total = total;
     }
 
-    public long getRunningtotal() {
-        return runningtotal;
+    public BigDecimal getRunningTotal() {
+        return runningTotal;
     }
 
-    public void setRunningtotal(long runningtotal) {
-        this.runningtotal = runningtotal;
+    public void setRunningTotal(BigDecimal runningTotal) {
+        this.runningTotal = runningTotal;
+    }
+
+    @XmlTransient
+    public Collection<InvoiceItems> getInvoiceItemsCollection() {
+        return invoiceItemsCollection;
+    }
+
+    public void setInvoiceItemsCollection(Collection<InvoiceItems> invoiceItemsCollection) {
+        this.invoiceItemsCollection = invoiceItemsCollection;
+    }
+
+    public Customers getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(Customers customerId) {
+        this.customerId = customerId;
     }
 
     @Override
