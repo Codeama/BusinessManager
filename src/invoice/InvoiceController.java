@@ -128,7 +128,8 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         if( findCustomerByName!= null){
         List<Customers> names = findCustomerByName.getResultList();
         TextFields.bindAutoCompletion(clientName, names.stream()
-                .map(Customers::getCustomerName).collect(Collectors.toList()));
+                .map(Customers::getCustomerName).collect(Collectors.toList()))
+                .setOnAutoCompleted(event -> autoCompleteRecipient());
         }
         //initialize invoice number in textfield
         
@@ -505,6 +506,18 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
       alert.setContentText(message);
       alert.showAndWait();
    }
+    
+    public void autoCompleteRecipient(){
+        TypedQuery<Customers> findByName = 
+         entityManager.createNamedQuery(
+            "Customers.findByCustomerName", Customers.class);
+        findByName.setParameter("customerName", clientName.getText());
+        findByName.getResultList().forEach(customer -> {
+            clientAddress.setText(customer.getAddressLine1());
+            clientCity.setText(customer.getCity());
+            clientPostCode.setText(customer.getPostCode());
+        });
+    }
     
     
     
