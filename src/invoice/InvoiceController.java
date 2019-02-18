@@ -8,18 +8,25 @@ package invoice;
 import business.manager.BusinessManager;
 import business.manager.ScreenChangeListener;
 import business.manager.ScreenHandler;
+import entity_classes.Customers;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.text.NumberFormat;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
@@ -30,12 +37,18 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import rst.pdfbox.layout.elements.Paragraph;
 import rst.pdfbox.layout.text.BaseFont;
 import rst.pdfbox.layout.text.Indent;
 import rst.pdfbox.layout.text.SpaceUnit;
 
+import org.controlsfx.control.textfield.TextFields;
 /**
  * FXML Controller class
  *
@@ -95,6 +108,14 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     
     private InvoicePDF document = new InvoicePDF();
     
+    //****************ENTITY MANAGER*****************
+    EntityManagerFactory entityManagerFactory =
+            Persistence.createEntityManagerFactory("Business_ManagerPU");
+    
+    EntityManager entityManager = entityManagerFactory.createEntityManager();
+    
+    TypedQuery<Customers> findCustomerByName = entityManager.createNamedQuery(
+            "Customers.findAll", Customers.class);
     
     
     /**
@@ -102,6 +123,15 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        //*************************************\\
+        //findCustomerByName.setParameter("customerName", clientName.getText());
+        if( findCustomerByName!= null){
+        List<Customers> names = findCustomerByName.getResultList();
+        TextFields.bindAutoCompletion(clientName, names.stream()
+                .map(Customers::getCustomerName).collect(Collectors.toList()));
+        }
+        //initialize invoice number in textfield
+        
         //clientCity.setPromptText("City");
         
         //=======ComboBox for Flat Rate Form==========
@@ -119,7 +149,8 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         unitComboBox.getSelectionModel().selectedItemProperty()
                 .addListener((obsValue, oldValue, newValue) -> 
                         switchForm(obsValue, oldValue, newValue));
-
+        
+        
         //=====Description TextField editing mode====
         descriptionCol.setCellFactory(TextFieldTableCell.forTableColumn());
 
@@ -137,6 +168,9 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         //=====for changes in Quantity TextField for Unit Rate Form==
         unitQuantity.textProperty().addListener((obv, oldValue, newValue)->
             computeQuantityChange(obv, oldValue, newValue));
+        
+        //tableView editing mode (delete)
+        //amountCol.setCellFactory(ButtonTableCell.forTableColumn());
     }
 
     
@@ -433,7 +467,44 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     };
     return tableCell;
 }
+    
+    
 
+    public void addNewCustomer(){
+        //get recipient details and save in customer table
+        //ObservableList<Customers> customerName = FXCollections.observableArrayList();
+        Customers customer = new Customers();
+    
+       // TextFields.bindAutoCompletion(clientName, findCustomerByName.getResultList());
+        customer.setCustomerName(clientName.getText());
+        customer.setAddressLine1(clientAddress.getText());
+        customer.setPostCode(clientPostCode.getText());
+        customer.setCity(clientCity.getText());
+        //customer.setPhoneNumber(clientPhoneNumber);
+        
+         EntityTransaction transaction = entityManager.getTransaction();
+         try{
+             transaction.begin();
+             entityManager.persist(customer);
+             transaction.commit();
+             displayAlert(AlertType.INFORMATION, 
+                     "Address Book updated", 
+                     "New customer added to Address Book");
+         }catch(Exception e){
+             displayAlert(AlertType.ERROR, "Address Book Not Updated", 
+            "Unable to update: " + e);
+         }
+        
+        //
+    }
+    
+    private void displayAlert(
+      Alert.AlertType type, String title, String message) {
+      Alert alert = new Alert(type);
+      alert.setTitle(title);
+      alert.setContentText(message);
+      alert.showAndWait();
+   }
     
     
     
