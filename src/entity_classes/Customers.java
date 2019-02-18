@@ -40,6 +40,9 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Customers.findByEmailAddress", query = "SELECT c FROM Customers c WHERE c.emailAddress = :emailAddress")})
 public class Customers implements Serializable {
 
+    @Column(name = "PHONE_NUMBER")
+    private Short phoneNumber;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -185,6 +188,14 @@ public class Customers implements Serializable {
     @Override
     public String toString() {
         return "entity_classes.Customers[ customerId=" + customerId + " ]";
+    }
+
+    public Short getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(Short phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
     
 }
