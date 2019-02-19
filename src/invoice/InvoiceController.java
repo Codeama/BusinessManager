@@ -13,7 +13,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
+import java.sql.Date;
 import java.text.NumberFormat;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -124,16 +126,14 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //*************************************\\
-        //findCustomerByName.setParameter("customerName", clientName.getText());
+        //set auto-complete with controlsfx
         if( findCustomerByName!= null){
         List<Customers> names = findCustomerByName.getResultList();
         TextFields.bindAutoCompletion(clientName, names.stream()
                 .map(Customers::getCustomerName).collect(Collectors.toList()))
                 .setOnAutoCompleted(event -> autoCompleteRecipient());
         }
-        //initialize invoice number in textfield
         
-        //clientCity.setPromptText("City");
         
         //=======ComboBox for Flat Rate Form==========
         flatRateComboBox.setItems(flatComboItems);
@@ -516,10 +516,20 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             clientAddress.setText(customer.getAddressLine1());
             clientCity.setText(customer.getCity());
             clientPostCode.setText(customer.getPostCode());
+            invoiceNo.setText("INV-"+(customer.getCustomerId().toString() + currentDateTime().toString()));
         });
     }
     
+    public Date currentDateTime(){
+        java.sql.Date date = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+        return date;
+    }
     
+    public void sendInvoice(){
+        //check client details don't already exist in database(Customers) i.e.
+        //compare all entries are not the same; if name and/or email are the same
+        //if false, create new customer entry
+    }
     
     //to be revisited; conflicting cell editing due to two different input grids
 //    @FXML
