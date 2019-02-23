@@ -15,6 +15,11 @@ import java.math.RoundingMode;
 import java.net.URL;
 import java.sql.Date;
 import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import static java.time.temporal.TemporalQueries.localDate;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Iterator;
@@ -516,13 +521,20 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             clientAddress.setText(customer.getAddressLine1());
             clientCity.setText(customer.getCity());
             clientPostCode.setText(customer.getPostCode());
-            invoiceNo.setText("INV-"+(customer.getCustomerId().toString() + currentDateTime().toString()));
+            invoiceNo.setText("INV"+(currentDateTime()));
+            System.out.println(currentDateTime());
         });
     }
     
-    public Date currentDateTime(){
-        java.sql.Date date = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-        return date;
+    public String currentDateTime(){
+       LocalDate date = LocalDate.now();
+       DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+       String dateString = date.format(dateFormatter);
+       LocalTime time = LocalTime.now();
+       DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("Hmmss");
+       String timeString = time.format(timeFormatter);
+      
+        return dateString + timeString;
     }
     
     public void sendInvoice(){
