@@ -9,10 +9,14 @@ import business.manager.BusinessManager;
 import business.manager.ScreenChangeListener;
 import business.manager.ScreenHandler;
 import entity_classes.Customers;
+import entity_classes.Invoices;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Date;
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -76,6 +80,9 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
 
     @FXML
     private TextField clientPostCode;
+    
+    @FXML
+    private TextField clientEmail;
 
     @FXML
     private TextField invoiceNo;
@@ -85,6 +92,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
 
     @FXML
     private DatePicker invoiceDueDate;
+    
     @FXML private StackPane formStack;
     @FXML private GridPane flatRateForm;
     @FXML private GridPane unitRateForm;
@@ -110,10 +118,10 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             "flat rate", "by hour", "by item");
     
     private RateBean rateBean = null;
-    private InvoiceBean invoice = new InvoiceBean();
+    private InvoiceBean invoiceBean = new InvoiceBean();
     private NumberFormat currency = NumberFormat.getCurrencyInstance();
     
-    private InvoicePDF document = new InvoicePDF();
+    private InvoicePDFTemplate document = new InvoicePDFTemplate();
     
     //****************ENTITY MANAGER*****************
     EntityManagerFactory entityManagerFactory =
@@ -131,7 +139,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //*************************************\\
-        //set auto-complete with controlsfx
+        //set auto-complete recipient details with controlsfx
         if( findCustomerByName!= null){
         List<Customers> names = findCustomerByName.getResultList();
         TextFields.bindAutoCompletion(clientName, names.stream()
@@ -139,6 +147,11 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
                 .setOnAutoCompleted(event -> autoCompleteRecipient());
         }
         
+        //***********auto-set invoice number*********
+        invoiceNo.setText("INV"+(currentDateTime()));
+        
+        //***********set current date*********
+        invoiceDate.setValue(LocalDate.now());
         
         //=======ComboBox for Flat Rate Form==========
         flatRateComboBox.setItems(flatComboItems);
@@ -301,65 +314,25 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             RateBean row = tableView.getSelectionModel().getSelectedItem();
             BigDecimal amount = row.getTotal();
             tableView.getItems().remove(row);
-            BigDecimal itemTotal = invoice.removeFromInvoice(amount);
+            BigDecimal itemTotal = invoiceBean.removeFromInvoice(amount);
             invoiceTotal.setText(currency.format(itemTotal));//String.valueOf(itemTotal));
         }
     }
     
     @FXML
     public void saveAsPDF() throws IOException{
-        final StringBuilder content = new StringBuilder();
-        
-        String sender = "94 Willmore Road, Birmingham B20 3JJ";
-        StringBuilder receiver = new StringBuilder();
-        StringBuilder invoiceDetails = new StringBuilder();
-        receiver.append(clientName.getText());
-        receiver.append(System.lineSeparator());
-        receiver.append(clientAddress.getText());
-        
-        invoiceDetails.append(invoiceNo.getText());
-        invoiceDetails.append(System.lineSeparator());
-        invoiceDetails.append("23/01/2019");
-        
-        ObservableList<RateBean> text = tableView.getItems();
-        //Iterator textIterator = text.iterator();
-        //while(textIterator.hasNext()){
-        //StringBuilder content = new StringBuilder();
-        text.forEach((item) -> {
-            System.out.printf("%s \t %s \t %s \t %s%n", item.getDescription(),
-                    item.getQuantity(), item.getPrice(), item.getTotal());
-            content.append(item.getDescription());
-            content.append("      ");
-            content.append(item.getQuantity());
-            content.append("      ");
-            //content.append(currency);
-            content.append(currency.format(item.getPrice()));
-            content.append(item.getTotal());
-            content.append(System.lineSeparator());
-        });
-        System.out.println(content.toString());
 
+        ObservableList<RateBean> text = tableView.getItems();
+        InvoicePDFContent invoiceContent = new InvoicePDFContent();
+        String sender = invoiceContent.getSender();
+        String receiver = invoiceContent.addRecipient(clientName.getText(),
+                clientAddress.getText(), clientCity.getText(), 
+                clientPostCode.getText(), clientEmail.getText());
+        String invoiceDetails = invoiceContent.addInvoiceDetails(
+                invoiceNo.getText(), invoiceDate.getValue().toString());
+        String invoiceItems = invoiceContent.addInvoiceItems(text);
         
-        document.createDocument(sender, receiver.toString(), invoiceDetails.toString(), content.toString());
-        
-//        ObservableList<RateBean> text = tableView.getItems();
-//        Iterator textIterator = text.iterator();
-//        //while(textIterator.hasNext()){
-//        //StringBuilder content = new StringBuilder();
-//        text.forEach((item) -> {
-//            System.out.printf("%s \t %s \t %s \t %s%n", item.getDescription(),
-//                    item.getQuantity(), item.getPrice(), item.getTotal());
-//            content.append(item.getDescription());
-//            content.append(" ");
-//            content.append(item.getQuantity());
-//            content.append(" ");
-//            //content.append(currency);
-//            content.append(currency.format(item.getPrice()));
-//            content.append(item.getTotal());
-//        });
-//        System.out.println(content.toString());
-        //}
-//        document.createDocument(content.toString());
+        document.createDocument(sender, receiver, invoiceDetails, invoiceItems, invoiceNo.getText());
     }
     
     private void addInvoiceItems() throws IOException{
@@ -433,7 +406,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             amountCol.setCellFactory(tableColumn -> addCurrency());
             priceCol.setCellFactory(tableColumn -> addCurrency());
             tableView.setItems(rowContent);
-            invoiceTotal.setText(currency.format(invoice.addToInvoice(rateBean.getTotal())));
+            invoiceTotal.setText(currency.format(invoiceBean.addToInvoice(rateBean.getTotal())));
             //clear flat rate form
             flatRateDescription.clear();
             flatRateAmount.clear();
@@ -452,7 +425,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             priceCol.setCellFactory(tableColumn -> addCurrency());
             amountCol.setCellFactory(tableColumn -> addCurrency());
             tableView.setItems(rowContent);
-            invoiceTotal.setText(currency.format(invoice.addToInvoice(rateBean.getTotal())));
+            invoiceTotal.setText(currency.format(invoiceBean.addToInvoice(rateBean.getTotal())));
             //clear unit rate form
             unitDescription.clear();
             unitQuantity.clear();
@@ -521,8 +494,6 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             clientAddress.setText(customer.getAddressLine1());
             clientCity.setText(customer.getCity());
             clientPostCode.setText(customer.getPostCode());
-            invoiceNo.setText("INV"+(currentDateTime()));
-            System.out.println(currentDateTime());
         });
     }
     
@@ -537,11 +508,28 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         return dateString + timeString;
     }
     
-    public void sendInvoice(){
+    public void saveInvoice(){
         //check client details don't already exist in database(Customers) i.e.
         //compare all entries are not the same; if name and/or email are the same
         //if false, create new customer entry
+        //1) if customerId == null {save new details to customers table}
+            //else if customerId != null {check all data fields are the same; if so
+                    //do nothing in customer table
+                    //otherwise create new entry for Customer
+                    
+        //2) record invoice date, customerId (might need this in initialize so I have an ID ready before saving?),
+            //invoice no, file_path (create FileManager), status (draft),invoice total, on table Invoices
+        
+        //3) record invoice items on table Invoice Items
     }
+    
+    private void recordInvoiceItems(){
+        Invoices invoice = new Invoices();
+        invoice.setDate(java.sql.Date.valueOf(invoiceDate.getValue()));
+        invoice.setInvoiceNo(invoiceNo.getText()); //check no doesn't already exist in database
+        invoice.setFilePath("");
+    }
+    
     
     //to be revisited; conflicting cell editing due to two different input grids
 //    @FXML
