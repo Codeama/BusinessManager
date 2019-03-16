@@ -311,8 +311,9 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             RateBean row = tableView.getSelectionModel().getSelectedItem();
             BigDecimal amount = row.getTotal();
             tableView.getItems().remove(row);
-            BigDecimal itemTotal = invoiceBean.removeFromInvoice(amount);
-            invoiceTotal.setText(currency.format(itemTotal));//String.valueOf(itemTotal));
+            invoiceBean.removeFromInvoice(amount);
+            BigDecimal total = invoiceBean.getTotalInvoice();
+            invoiceTotal.setText(currency.format(total));//String.valueOf(itemTotal));
         }
     }
     
@@ -392,7 +393,9 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             amountCol.setCellFactory(tableColumn -> addCurrency());
             priceCol.setCellFactory(tableColumn -> addCurrency());
             tableView.setItems(rowContent);
-            invoiceTotal.setText(currency.format(invoiceBean.addToInvoice(rateBean.getTotal())));
+            invoiceBean.addToInvoice(rateBean.getTotal());
+            BigDecimal total = invoiceBean.getTotalInvoice();
+            invoiceTotal.setText(currency.format(total));
             //clear flat rate form
             flatRateDescription.clear();
             flatRateAmount.clear();
@@ -411,7 +414,9 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             priceCol.setCellFactory(tableColumn -> addCurrency());
             amountCol.setCellFactory(tableColumn -> addCurrency());
             tableView.setItems(rowContent);
-            invoiceTotal.setText(currency.format(invoiceBean.addToInvoice(rateBean.getTotal())));
+            invoiceBean.addToInvoice(rateBean.getTotal());
+            BigDecimal total = invoiceBean.getTotalInvoice();
+            invoiceTotal.setText(currency.format(total));
             //clear unit rate form
             unitDescription.clear();
             unitQuantity.clear();
