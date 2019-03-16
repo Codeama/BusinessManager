@@ -22,6 +22,10 @@ public class InvoiceBean {
         
     }
     
+    /**
+     * 
+     * @return total value of an invoice
+     */
     public BigDecimal getTotalInvoice(){
         return invoiceTotal.get();
     }
@@ -30,9 +34,9 @@ public class InvoiceBean {
      * 
      * @param itemTotal is the total of each row item
      * @see RateBean#getTotal() 
-     * @return itemTotal value of an invoice
+     * 
      */
-    public BigDecimal addToInvoice(BigDecimal itemTotal){
+    public void addToInvoice(BigDecimal itemTotal){
         ObjectBinding<BigDecimal> sumTotal= new ObjectBinding(){
             @Override
             protected BigDecimal computeValue() {
@@ -41,10 +45,10 @@ public class InvoiceBean {
             }
         };
         invoiceTotal.bind(sumTotal);
-        return invoiceTotal.get();
+       // return invoiceTotal.get();
     }
     
-    public BigDecimal removeFromInvoice(BigDecimal itemTotal){
+    public void removeFromInvoice(BigDecimal itemTotal){
         ObjectBinding<BigDecimal> subtractTotal = new ObjectBinding(){
             @Override
             protected BigDecimal computeValue() {
@@ -53,7 +57,7 @@ public class InvoiceBean {
             }
         };
         invoiceTotal.bind(subtractTotal);
-        return invoiceTotal.get();
+       // return invoiceTotal.get();
     }
     
 }
