@@ -13,6 +13,9 @@ import org.junit.Before;
 /**
  *
  * @author BUKOLA
+ * Each @Test cycle resets invoiceTotal to 0;
+ *          not the intended result AND this
+ *          would be different with JUnit5
  */
 public class InvoiceBeanTest {
     
