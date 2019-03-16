@@ -22,6 +22,10 @@ public class InvoiceBean {
         
     }
     
+    public BigDecimal getTotalInvoice(){
+        return invoiceTotal.get();
+    }
+    
     /**
      * 
      * @param itemTotal is the total of each row item
