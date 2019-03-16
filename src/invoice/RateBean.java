@@ -29,10 +29,18 @@ public class RateBean{
     private ObjectProperty<BigDecimal> total;
     private ObjectProperty<BigDecimal> runningTotal;
     
+//    public RateBean(){
+//        this("", BigDecimal.ZERO, BigDecimal.ZERO);
+//    }
+    
     public RateBean(String description, BigDecimal quantity, BigDecimal price) {
         this.description = new SimpleStringProperty(description);
         this.price = new SimpleObjectProperty<>(price);
         this.quantity = new SimpleObjectProperty<>(quantity);
+        
+        if(quantity.compareTo(BigDecimal.ZERO) <= 0)
+            throw new IllegalArgumentException("Quantity cannot be <= ZERO");
+
         total = new SimpleObjectProperty(new BigDecimal(0));
         runningTotal = new SimpleObjectProperty(BigDecimal.ZERO);
             }
@@ -59,6 +67,9 @@ public class RateBean{
     }
 
     public void setQuantity(BigDecimal quantity){
+        if(quantity.compareTo(BigDecimal.ZERO) <= 0)
+            throw new IllegalArgumentException("Quantity cannot be <= ZERO");
+
         this.quantity.set(quantity);
     }
     
