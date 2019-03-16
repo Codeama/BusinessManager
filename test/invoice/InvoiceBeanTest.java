@@ -17,12 +17,8 @@ import org.junit.Before;
 public class InvoiceBeanTest {
     
    
-    InvoiceBean invoiceBean;
+    InvoiceBean invoiceBean = new InvoiceBean();
     
-    @Before
-    public void setUp(){
-        invoiceBean = new InvoiceBean();
-    }
     
     @Test
     public void checkInitialValueIsZero(){
@@ -36,28 +32,32 @@ public class InvoiceBeanTest {
      */
     @Test
     public void testAddToInvoice() {
+        invoiceBean.addToInvoice(new BigDecimal(55)); //add 55
         BigDecimal expected = new BigDecimal(55);
-        invoiceBean.addToInvoice(new BigDecimal(55));
         BigDecimal actual = invoiceBean.getTotalInvoice();
-        assertEquals(actual, expected);
+        assertEquals(expected, actual);
+        
+        invoiceBean.addToInvoice(new BigDecimal(22)); //add 22
+        BigDecimal expected2 = new BigDecimal(77);
+        BigDecimal actual2 = invoiceBean.getTotalInvoice();
+        assertEquals(expected2, actual2);
     }
     
-    /**
-     * Test of addToInvoice method, of class InvoiceBean.
-     */
-    @Test
-    public void testAddToInvoice2() {
-        BigDecimal expected = new BigDecimal(110);
-        BigDecimal actual = invoiceBean.addToInvoice(new BigDecimal(55));
-         //invoiceBean.getTotalInvoice();
-        assertEquals(invoiceBean.getTotalInvoice(), expected);
-    }
 
     /**
      * Test of removeFromInvoice method, of class InvoiceBean.
      */
     @Test
     public void testRemoveFromInvoice() {
+        invoiceBean.addToInvoice(new BigDecimal(25)); //add 25
+        BigDecimal expected = new BigDecimal(25);
+        BigDecimal actual = invoiceBean.getTotalInvoice();
+        assertEquals(expected, actual);
+        
+        invoiceBean.removeFromInvoice(new BigDecimal(25)); //subtract 35
+        BigDecimal expected2 = new BigDecimal(0);
+        BigDecimal actual2 = invoiceBean.getTotalInvoice();
+        assertEquals(expected2, actual2);
     }
     
 }
