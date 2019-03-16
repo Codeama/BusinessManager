@@ -50,16 +50,16 @@ public class InvoicePDFContent{
 	public String addInvoiceItems(ObservableList<RateBean> items){
 		items.forEach(item -> {
             content.append(item.getDescription());
-            content.append("    ").append("     ").append("     ").append("     ").append("     ")
-                    .append(" ").append(" ").append(" ").append(" ").append(" ");
+            content.append("    ").append("     ").append("     ").append("     ");
+            content.append("    ").append("     ").append("     ").append("     ");
             content.append(item.getQuantity());
-            content.append(" ").append(" ").append(" ").append(" ").append(" ")
-                    .append(" ").append(" ").append(" ").append(" ").append(" ");
+            content.append("    ").append("     ").append("     ").append("     ");
+            content.append("    ").append("     ").append("     ").append("     ");
             //content.append(currency);
             content.append(currency.format(item.getPrice()));
-            content.append(" ").append(" ").append(" ").append(" ").append(" ")
-                    .append(" ").append(" ").append(" ").append(" ").append(" ");
-            content.append(item.getTotal());
+            content.append("    ").append("     ").append("     ").append("     ");
+            content.append("    ").append("     ").append("     ").append("     ");
+            content.append(currency.format(item.getTotal()));
             content.append(System.lineSeparator());
 		});
 		

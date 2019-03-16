@@ -9,27 +9,23 @@ import business.manager.BusinessManager;
 import business.manager.ScreenChangeListener;
 import business.manager.ScreenHandler;
 import entity_classes.Customers;
+import entity_classes.InvoiceItems;
 import entity_classes.Invoices;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.Date;
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import static java.time.temporal.TemporalQueries.localDate;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -37,7 +33,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
@@ -53,11 +48,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import rst.pdfbox.layout.elements.Paragraph;
-import rst.pdfbox.layout.text.BaseFont;
-import rst.pdfbox.layout.text.Indent;
-import rst.pdfbox.layout.text.SpaceUnit;
 
 import org.controlsfx.control.textfield.TextFields;
 /**
@@ -123,7 +113,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     
     private InvoicePDFTemplate document = new InvoicePDFTemplate();
     
-    //****************ENTITY MANAGER*****************
+            //**********ENTITY MANAGER**********
     EntityManagerFactory entityManagerFactory =
             Persistence.createEntityManagerFactory("Business_ManagerPU");
     
@@ -132,14 +122,20 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     TypedQuery<Customers> findCustomerByName = entityManager.createNamedQuery(
             "Customers.findAll", Customers.class);
     
+    Customers autoCustomer;
+    
+   // TypedQuery<Customers> findOneCustomer = entityManager.createNamedQuery(
+   //         "Customers.findByCustomerName", Customers.class);
+    
+    boolean isAutoCompleted;
+    
     
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        //*************************************\\
-        //set auto-complete recipient details with controlsfx
+            //*****auto-complete recipient fields(Controlsfx)****
         if( findCustomerByName!= null){
         List<Customers> names = findCustomerByName.getResultList();
         TextFields.bindAutoCompletion(clientName, names.stream()
@@ -147,24 +143,25 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
                 .setOnAutoCompleted(event -> autoCompleteRecipient());
         }
         
-        //***********auto-set invoice number*********
+            //****auto-set invoice number*********
         invoiceNo.setText("INV"+(currentDateTime()));
         
-        //***********set current date*********
+            //******set current date*********
         invoiceDate.setValue(LocalDate.now());
         
-        //=======ComboBox for Flat Rate Form==========
+            //*****ComboBox for Flat Rate Form****
         flatRateComboBox.setItems(flatComboItems);
         flatRateComboBox.getSelectionModel().select("flat rate");
-        //=======observe selection changes=======
+            //******observe selection changes*****
         flatRateComboBox.getSelectionModel().selectedItemProperty()
                 .addListener((obsValue, oldValue, newValue) -> 
                         switchForm(obsValue, oldValue, newValue));            
 
-        //======ComboBox for Unit Rate Form======
+            //*****ComboBox for Unit Rate Form****
         unitComboBox.setItems(unitComboItems);
         unitComboBox.getSelectionModel().select("by hour");
-        //======observe selection changes========
+        
+            //****observe selection changes*******
         unitComboBox.getSelectionModel().selectedItemProperty()
                 .addListener((obsValue, oldValue, newValue) -> 
                         switchForm(obsValue, oldValue, newValue));
@@ -323,6 +320,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     public void saveAsPDF() throws IOException{
 
         ObservableList<RateBean> text = tableView.getItems();
+        //load PDF content with invoice data
         InvoicePDFContent invoiceContent = new InvoicePDFContent();
         String sender = invoiceContent.getSender();
         String receiver = invoiceContent.addRecipient(clientName.getText(),
@@ -331,23 +329,11 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         String invoiceDetails = invoiceContent.addInvoiceDetails(
                 invoiceNo.getText(), invoiceDate.getValue().toString());
         String invoiceItems = invoiceContent.addInvoiceItems(text);
+        //add contents to PDF document template
+        document.createDocument(sender, receiver, invoiceDetails, 
+                invoiceItems, invoiceNo.getText());
         
-        document.createDocument(sender, receiver, invoiceDetails, invoiceItems, invoiceNo.getText());
-    }
-    
-    private void addInvoiceItems() throws IOException{
-        Paragraph paragraph = new Paragraph();
-        paragraph.add(new Indent("DESCRIPTION", 170, SpaceUnit.pt, 11, PDType1Font.HELVETICA_BOLD));
-        paragraph.addText("QUANTITY     ", 11, PDType1Font.HELVETICA_BOLD);
-        paragraph.addMarkup("       ", 11, BaseFont.Helvetica);
-        paragraph.addMarkup("       ", 11, BaseFont.Helvetica);
-        paragraph.addMarkup("       ", 11, BaseFont.Helvetica);
-        paragraph.addText("PRICE        ", 11, PDType1Font.HELVETICA_BOLD);
-        paragraph.addMarkup("       ", 11, BaseFont.Helvetica);
-        paragraph.addMarkup("       ", 11, BaseFont.Helvetica);
-        paragraph.addMarkup("       ", 11, BaseFont.Helvetica);
-        paragraph.addMarkup("*TOTAL*", 11, BaseFont.Helvetica);
-
+        System.out.println(document.getFilePath());
     }
     
     private void createFlatRateBean(){
@@ -460,7 +446,6 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         customer.setPostCode(clientPostCode.getText());
         customer.setCity(clientCity.getText());
         //customer.setPhoneNumber(clientPhoneNumber);
-        
          EntityTransaction transaction = entityManager.getTransaction();
          try{
              transaction.begin();
@@ -494,6 +479,8 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             clientAddress.setText(customer.getAddressLine1());
             clientCity.setText(customer.getCity());
             clientPostCode.setText(customer.getPostCode());
+            isAutoCompleted = true;
+            autoCustomer = customer;
         });
     }
     
@@ -512,22 +499,134 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         //check client details don't already exist in database(Customers) i.e.
         //compare all entries are not the same; if name and/or email are the same
         //if false, create new customer entry
-        //1) if customerId == null {save new details to customers table}
-            //else if customerId != null {check all data fields are the same; if so
+        //1) if getNewCustomerId == null {save new details to customers table}
+            //else if getNewCustomerId != null {check all data fields are the same; if so
                     //do nothing in customer table
                     //otherwise create new entry for Customer
                     
-        //2) record invoice date, customerId (might need this in initialize so I have an ID ready before saving?),
+        //2) record invoice date, getNewCustomerId (might need this in initialize so I have an ID ready before saving?),
             //invoice no, file_path (create FileManager), status (draft),invoice total, on table Invoices
         
         //3) record invoice items on table Invoice Items
     }
+    //this only marks as issued and saves a PDF copy
+    //TODO send via email as web application
+    public void sendInvoice(){
+        //Customers customer = new Customers();
+        Invoices invoice = new Invoices();
+        
+        EntityTransaction transaction = entityManager.getTransaction();
+        try{
+            saveAsPDF();
+        invoice.setDate(java.sql.Date.valueOf(invoiceDate.getValue()));
+        invoice.setInvoiceNo(invoiceNo.getText());
+        invoice.setCustomerId(autoCustomer);
+        invoice.setFilePath(document.getFilePath());
+        invoice.setStatus("ISSUESD");
+        invoice.setTotal(BigDecimal.TEN);
+        invoice.setRunningTotal(BigDecimal.ZERO);
+        
+        
+         ObservableList<RateBean> allItems = tableView.getItems();
+        allItems.forEach(item ->{
+            InvoiceItems invoiceItem = new InvoiceItems();
+            invoiceItem.setInvoiceNo(invoice);
+            invoiceItem.setCustomerId(autoCustomer);
+            invoiceItem.setDescription(item.getDescription());
+            invoiceItem.setQuantity(item.getQuantity());
+            invoiceItem.setPrice(item.getPrice());
+            invoiceItem.setAmount(item.getTotal());
+            transaction.begin();
+             entityManager.persist(invoiceItem);
+        });
+        
+         
+        // try{
+             //transaction.begin();
+             entityManager.persist(invoice);
+            
+             transaction.commit();
+             displayAlert(AlertType.INFORMATION, 
+                     "Invoice Status", 
+                     "Invoice sent!");
+         }catch(Exception e){
+             displayAlert(AlertType.ERROR, "Send Failed", 
+            "Unable to send invoice: " + e);
+         }
+        
+//        if(isAutoCompleted){
+//            //customer = autoCustomer;
+//            try {
+//                saveAsPDF();
+//            } catch (IOException ex) {
+//               ex.printStackTrace();
+//            }
+//            recordInvoiceDetails(customer, "ISSUED");
+//            recordInvoiceItems(customer, invoice);
+//        }
+//        else{
+//            addNewCustomer();
+//            try {
+//                saveAsPDF();
+//            } catch (IOException ex) {
+//                Logger.getLogger(InvoiceController.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//            recordInvoiceDetails(customer, "ISSUED");
+//            recordInvoiceItems(customer, invoice);
+//
+//        }
+        
+    }
     
-    private void recordInvoiceItems(){
+    private void recordInvoiceDetails(Customers customer, String invoiceStatus){
         Invoices invoice = new Invoices();
         invoice.setDate(java.sql.Date.valueOf(invoiceDate.getValue()));
-        invoice.setInvoiceNo(invoiceNo.getText()); //check no doesn't already exist in database
-        invoice.setFilePath("");
+        invoice.setInvoiceNo(invoiceNo.getText());
+        invoice.setCustomerId(customer);
+        invoice.setFilePath(document.getFilePath());
+        invoice.setStatus(invoiceStatus);
+        invoice.setTotal(BigDecimal.TEN);
+        //TODO set runningTotal here
+        
+        EntityTransaction transaction = entityManager.getTransaction();
+         try{
+             transaction.begin();
+             entityManager.persist(invoice);
+             transaction.commit();
+             displayAlert(AlertType.INFORMATION, 
+                     "Invoice Status", 
+                     "Invoice sent!");
+         }catch(Exception e){
+             displayAlert(AlertType.ERROR, "Send Failed", 
+            "Unable to send invoice: " + e);
+         }
+    }
+    
+    private void recordInvoiceItems(Customers customer, Invoices invoice){
+        ObservableList<RateBean> allItems = tableView.getItems();
+        allItems.forEach(item ->{
+            InvoiceItems invoiceItem = new InvoiceItems();
+            invoiceItem.setInvoiceNo(invoice);
+            invoiceItem.setCustomerId(customer);
+            invoiceItem.setDescription(item.getDescription());
+            invoiceItem.setQuantity(item.getQuantity());
+            invoiceItem.setPrice(item.getPrice());
+            invoiceItem.setAmount(item.getTotal());
+            
+            EntityTransaction transaction = entityManager.getTransaction();
+         try{
+             transaction.begin();
+             entityManager.persist(invoiceItem);
+             transaction.commit();
+             System.out.println("Invoice item recorded");
+         }catch(Exception e){
+             displayAlert(AlertType.ERROR, "Problem recording item", 
+            "Unable to record item: " + e);
+         }
+            
+        });
+        
+        
     }
     
     

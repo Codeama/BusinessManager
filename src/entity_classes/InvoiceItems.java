@@ -36,6 +36,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "InvoiceItems.findByAmount", query = "SELECT i FROM InvoiceItems i WHERE i.amount = :amount")})
 public class InvoiceItems implements Serializable {
 
+    @Column(name = "QUANTITY")
+    private BigDecimal quantity;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,8 +47,6 @@ public class InvoiceItems implements Serializable {
     private Integer itemNo;
     @Column(name = "DESCRIPTION")
     private String description;
-    @Column(name = "QUANTITY")
-    private Integer quantity;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @Column(name = "PRICE")
@@ -89,13 +90,6 @@ public class InvoiceItems implements Serializable {
         this.description = description;
     }
 
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
 
     public BigDecimal getPrice() {
         return price;
@@ -152,6 +146,14 @@ public class InvoiceItems implements Serializable {
     @Override
     public String toString() {
         return "entity_classes.InvoiceItems[ itemNo=" + itemNo + " ]";
+    }
+
+    public BigDecimal getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(BigDecimal quantity) {
+        this.quantity = quantity;
     }
     
 }

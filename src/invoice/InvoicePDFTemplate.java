@@ -45,6 +45,7 @@ public class InvoicePDFTemplate {
     Document document = new Document(40, 60, 40, 60);
     Paragraph paragraph;
     PDPageContentStream pdStream;
+    String filePath;
     
 
     public void createDocument(String sender, String receiver, 
@@ -58,9 +59,15 @@ public class InvoicePDFTemplate {
         createHeadings();
         document.add(new VerticalSpacer(25));
         addInvoiceItems(invoiceContent);
-        OutputStream outputStream = new FileOutputStream(getInvoiceFilePath() +"/"+invoiceNo+".pdf" );
+        filePath = getInvoiceFilePath() +"/"+invoiceNo+".pdf" ;
+        OutputStream outputStream = new FileOutputStream(filePath);
+        //outputStream.
         document.save(outputStream);
         outputStream.close();
+    }
+    
+    public String getFilePath(){
+        return filePath;
     }
     
      private String getInvoiceFilePath() throws IOException{

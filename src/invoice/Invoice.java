@@ -5,6 +5,7 @@
  */
 package invoice;
 
+import entity_classes.Customers;
 import entity_classes.Invoices;
 import entity_classes.Invoices;
 import java.math.BigDecimal;
@@ -77,10 +78,20 @@ public class Invoice {
 //        //}
     }
     
+    public void showCustomersName(){
+        TypedQuery<Customers> findCustomerByName = entityManager.createNamedQuery(
+            "Customers.findByCustomerName", Customers.class);
+        findCustomerByName.setParameter("customerName", "Chizim");
+        findCustomerByName.getResultList().forEach(customer -> System.out.print(customer.getCustomerName()));
+
+    }
+    
     public static void main(String[] args){
+     
         Invoice inv = new Invoice();
-        inv.addEntry();
-        inv.displayInvoice();
+//        inv.addEntry();
+//        inv.displayInvoice();
+        inv.showCustomersName();
     }
     
 }
