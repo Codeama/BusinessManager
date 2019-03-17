@@ -303,6 +303,8 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
                 & !unitPrice.getText().equals("")){
                   loadUnitRateData();
         }
+        
+        System.out.println(invoiceBean.getTotalInvoice());
     }
     
     @FXML
@@ -311,6 +313,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             RateBean row = tableView.getSelectionModel().getSelectedItem();
             BigDecimal amount = row.getTotal();
             tableView.getItems().remove(row);
+            tableView.refresh();
             invoiceBean.removeFromInvoice(amount);
             BigDecimal total = invoiceBean.getTotalInvoice();
             invoiceTotal.setText(currency.format(total));//String.valueOf(itemTotal));
@@ -337,6 +340,19 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         System.out.println(document.getFilePath());
     }
     
+    /**
+     * creates new RateBean object for flatRate entry from user,
+     *      initializing Quantity with value of 1.
+     * So whilst the TableView doesn't reflect quantity, the item quantity is
+     *      default of 1. 
+     * This behaviour (on the TableView which the user sees) changes as soon
+     *      as user selects a different item unit rating
+     * @see #createUnitRateBean() i.e. "by hour"/"by item".
+     * This time, even flatRate quantity automatically shows its
+     *      default value of 1. It is only cosmetic as
+     * @see #createDefaultQuantityBean() does the same job
+     * 
+     */
     private void createFlatRateBean(){
         try{
             rateBean = new RateBean(flatRateDescription.getText(), 
@@ -350,13 +366,18 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         }
     }
     
+    /**
+     * creates and initializes a new RateBean object with the aim of 
+     *      allowing user to enter desired number of units for each record.
+     * Quantity cannot be zero if this option is selected.
+     */
     private void createUnitRateBean(){
         try{
             rateBean = new RateBean(unitDescription.getText(), 
                         new BigDecimal(unitQuantity.getText()),
                         new BigDecimal(unitPrice.getText()));
         }
-        catch(NumberFormatException exception){
+        catch(Exception exception){
             if(!unitQuantity.getText().equals("")){
                 unitQuantity.setText("invalid");
                 unitQuantity.requestFocus();
