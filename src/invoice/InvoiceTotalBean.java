@@ -13,11 +13,11 @@ import javafx.beans.property.SimpleObjectProperty;
  *
  * @author BUKOLA
  */
-public class InvoiceBean {
+public class InvoiceTotalBean {
     private SimpleObjectProperty<BigDecimal> invoiceTotal;
     private BigDecimal total = new BigDecimal(0);
     
-    public InvoiceBean(){
+    public InvoiceTotalBean(){
         invoiceTotal = new SimpleObjectProperty(BigDecimal.ZERO);
         
     }
