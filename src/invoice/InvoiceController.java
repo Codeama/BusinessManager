@@ -109,6 +109,9 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     
     private RateBean rateBean = null;
     private final InvoiceTotalBean invoiceTotalBean = new InvoiceTotalBean();
+    //for aggregating invoices
+    private final InvoiceTotalBean runningTotal = new InvoiceTotalBean();
+    
     private final NumberFormat currency = NumberFormat.getCurrencyInstance();
     
     private final InvoicePDFTemplate document = new InvoicePDFTemplate();
@@ -117,9 +120,11 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     private final EntityManagerFactory entityManagerFactory =
             Persistence.createEntityManagerFactory("Business_ManagerPU");
     
-    private final EntityManager entityManager = entityManagerFactory.createEntityManager();
+    private final EntityManager entityManager = 
+            entityManagerFactory.createEntityManager();
     
-    private TypedQuery<Customers> findCustomerByName = entityManager.createNamedQuery(
+    private TypedQuery<Customers> findCustomerByName = 
+            entityManager.createNamedQuery(
             "Customers.findAll", Customers.class);
     
     Customers autoCustomer;
@@ -540,7 +545,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     //TODO send via email as web application
     public void sendInvoice(){
         //Customers customer = new Customers();
-        Invoices invoice = new Invoices();
+        Invoices invoice = new Invoices(); //entity object
         
         EntityTransaction transaction = entityManager.getTransaction();
         try{
@@ -551,10 +556,12 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         invoice.setFilePath(document.getFilePath());
         invoice.setStatus("ISSUED");
         invoice.setTotal(invoiceTotalBean.getTotalInvoice());
+        //fetch last running total?
+        runningTotal.addToInvoice(BigDecimal.ZERO);
         invoice.setRunningTotal(BigDecimal.ZERO);
         
         
-         ObservableList<RateBean> allItems = tableView.getItems();
+        ObservableList<RateBean> allItems = tableView.getItems();
         allItems.forEach(item ->{
             InvoiceItems invoiceItem = new InvoiceItems();
             invoiceItem.setInvoiceNo(invoice);
