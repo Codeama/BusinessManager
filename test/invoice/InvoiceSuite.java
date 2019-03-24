@@ -13,7 +13,7 @@ import org.junit.runners.Suite;
  * @author BUKOLA
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({invoice.InvoiceBeanTest.class, invoice.InvoicePDFTemplateTest.class, invoice.InvoiceTest.class, invoice.InvoicePDFContentTest.class, invoice.InvoiceControllerTest.class, invoice.RateBeanTest.class})
+@Suite.SuiteClasses({invoice.InvoiceTotalBeanTest.class, invoice.InvoicePDFTemplateTest.class, invoice.InvoiceTest.class, invoice.InvoicePDFContentTest.class, invoice.InvoiceControllerTest.class, invoice.RateBeanTest.class})
 public class InvoiceSuite {
     
 }

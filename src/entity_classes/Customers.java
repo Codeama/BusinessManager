@@ -37,11 +37,9 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Customers.findByPostCode", query = "SELECT c FROM Customers c WHERE c.postCode = :postCode")
     , @NamedQuery(name = "Customers.findByCity", query = "SELECT c FROM Customers c WHERE c.city = :city")
     , @NamedQuery(name = "Customers.findByCounty", query = "SELECT c FROM Customers c WHERE c.county = :county")
+    , @NamedQuery(name = "Customers.findByPhoneNumber", query = "SELECT c FROM Customers c WHERE c.phoneNumber = :phoneNumber")
     , @NamedQuery(name = "Customers.findByEmailAddress", query = "SELECT c FROM Customers c WHERE c.emailAddress = :emailAddress")})
 public class Customers implements Serializable {
-
-    @Column(name = "PHONE_NUMBER")
-    private Short phoneNumber;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -62,7 +60,8 @@ public class Customers implements Serializable {
     private String city;
     @Column(name = "COUNTY")
     private String county;
-    @Basic(optional = false)
+    @Column(name = "PHONE_NUMBER")
+    private Short phoneNumber;
     @Column(name = "EMAIL_ADDRESS")
     private String emailAddress;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "customerId")
@@ -77,10 +76,9 @@ public class Customers implements Serializable {
         this.customerId = customerId;
     }
 
-    public Customers(Integer customerId, String customerName, String emailAddress) {
+    public Customers(Integer customerId, String customerName) {
         this.customerId = customerId;
         this.customerName = customerName;
-        this.emailAddress = emailAddress;
     }
 
     public Integer getCustomerId() {
@@ -139,6 +137,14 @@ public class Customers implements Serializable {
         this.county = county;
     }
 
+    public Short getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(Short phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     public String getEmailAddress() {
         return emailAddress;
     }
@@ -188,14 +194,6 @@ public class Customers implements Serializable {
     @Override
     public String toString() {
         return "entity_classes.Customers[ customerId=" + customerId + " ]";
-    }
-
-    public Short getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(Short phoneNumber) {
-        this.phoneNumber = phoneNumber;
     }
     
 }

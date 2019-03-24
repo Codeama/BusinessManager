@@ -50,6 +50,7 @@ import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
 import org.controlsfx.control.textfield.TextFields;
+import com.bukola.*; //Tax Calculator API
 /**
  * FXML Controller class
  *
@@ -123,9 +124,12 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     private final EntityManager entityManager = 
             entityManagerFactory.createEntityManager();
     
-    private TypedQuery<Customers> findCustomerByName = 
+    private final TypedQuery<Customers> findCustomerByName = 
             entityManager.createNamedQuery(
             "Customers.findAll", Customers.class);
+    
+    private final TypedQuery<Invoices> getInvoiceAmount = 
+            entityManager.createNamedQuery("Invoices.findAll", Invoices.class);
     
     Customers autoCustomer;
     
@@ -148,7 +152,9 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
                 .setOnAutoCompleted(event -> autoCompleteRecipient());
         }
         
-            //****auto-set invoice number*********
+        
+        
+            //****auto-generate invoice number*********
         invoiceNo.setText("INV"+(currentDateTime()));
         
             //******set current date*********
@@ -544,6 +550,13 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     //this only marks as issued and saves a PDF copy
     //TODO send via email as web application
     public void sendInvoice(){
+        Wages wage = new Wages();
+        if(getInvoiceAmount!=null){
+            List<Invoices> subTotal = getInvoiceAmount.getResultList();
+            subTotal.forEach(invoice -> {wage.addPay(invoice.getTotal());});
+        }
+        //
+        //runningTotal +=total
         //Customers customer = new Customers();
         Invoices invoice = new Invoices(); //entity object
         
@@ -554,32 +567,37 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         invoice.setInvoiceNo(invoiceNo.getText());
         invoice.setCustomerId(autoCustomer);
         invoice.setFilePath(document.getFilePath());
-        invoice.setStatus("ISSUED");
+        invoice.setStatus("ISSUED"); //to be reviewed with Enums
         invoice.setTotal(invoiceTotalBean.getTotalInvoice());
         //fetch last running total?
+        wage.addPay(invoice.getTotal());//add current invoice total to wage
         runningTotal.addToInvoice(BigDecimal.ZERO);
-        invoice.setRunningTotal(BigDecimal.ZERO);
+        invoice.setRunningTotal(wage.getTotalPayToDate()); //add up invoices to date
+        entityManager.persist(invoice);
         
         
-        ObservableList<RateBean> allItems = tableView.getItems();
+        ObservableList<RateBean> allItems = tableView.getItems();//
         allItems.forEach(item ->{
             InvoiceItems invoiceItem = new InvoiceItems();
-            invoiceItem.setInvoiceNo(invoice);
+            invoiceItem.setInvoiceNo(invoiceNo.getText());
             invoiceItem.setCustomerId(autoCustomer);
             invoiceItem.setDescription(item.getDescription());
             invoiceItem.setQuantity(item.getQuantity());
             invoiceItem.setPrice(item.getPrice());
             invoiceItem.setAmount(item.getTotal());
-            transaction.begin();
+            
              entityManager.persist(invoiceItem);
+             
+             transaction.begin();
+             transaction.commit();
         });
         
          
         // try{
              //transaction.begin();
-             entityManager.persist(invoice);
+             //entityManager.persist(invoice);
             
-             transaction.commit();
+             //transaction.commit();
              displayAlert(AlertType.INFORMATION, 
                      "Invoice Status", 
                      "Invoice sent!");
@@ -640,7 +658,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         ObservableList<RateBean> allItems = tableView.getItems();
         allItems.forEach(item ->{
             InvoiceItems invoiceItem = new InvoiceItems();
-            invoiceItem.setInvoiceNo(invoice);
+            invoiceItem.setInvoiceNo(invoiceNo.getText());
             invoiceItem.setCustomerId(customer);
             invoiceItem.setDescription(item.getDescription());
             invoiceItem.setQuantity(item.getQuantity());

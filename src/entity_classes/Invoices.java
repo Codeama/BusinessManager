@@ -7,23 +7,21 @@ package entity_classes;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -35,11 +33,12 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "Invoices.findAll", query = "SELECT i FROM Invoices i")
     , @NamedQuery(name = "Invoices.findByDate", query = "SELECT i FROM Invoices i WHERE i.date = :date")
-    , @NamedQuery(name = "Invoices.findByInvoiceNo", query = "SELECT i FROM Invoices i WHERE i.invoiceNo = :invoiceNo")
     , @NamedQuery(name = "Invoices.findByFilePath", query = "SELECT i FROM Invoices i WHERE i.filePath = :filePath")
     , @NamedQuery(name = "Invoices.findByStatus", query = "SELECT i FROM Invoices i WHERE i.status = :status")
     , @NamedQuery(name = "Invoices.findByTotal", query = "SELECT i FROM Invoices i WHERE i.total = :total")
-    , @NamedQuery(name = "Invoices.findByRunningTotal", query = "SELECT i FROM Invoices i WHERE i.runningTotal = :runningTotal")})
+    , @NamedQuery(name = "Invoices.findByRunningTotal", query = "SELECT i FROM Invoices i WHERE i.runningTotal = :runningTotal")
+    , @NamedQuery(name = "Invoices.findById", query = "SELECT i FROM Invoices i WHERE i.id = :id")
+    , @NamedQuery(name = "Invoices.findByInvoiceNo", query = "SELECT i FROM Invoices i WHERE i.invoiceNo = :invoiceNo")})
 public class Invoices implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -47,10 +46,6 @@ public class Invoices implements Serializable {
     @Column(name = "DATE")
     @Temporal(TemporalType.DATE)
     private Date date;
-    @Id
-    @Basic(optional = false)
-    @Column(name = "INVOICE_NO")
-    private String invoiceNo;
     @Basic(optional = false)
     @Column(name = "FILE_PATH")
     private String filePath;
@@ -64,8 +59,14 @@ public class Invoices implements Serializable {
     @Basic(optional = false)
     @Column(name = "RUNNING_TOTAL")
     private BigDecimal runningTotal;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "invoiceNo")
-    private Collection<InvoiceItems> invoiceItemsCollection;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "ID")
+    private Integer id;
+    @Basic(optional = false)
+    @Column(name = "INVOICE_NO")
+    private String invoiceNo;
     @JoinColumn(name = "CUSTOMER_ID", referencedColumnName = "CUSTOMER_ID")
     @ManyToOne(optional = false)
     private Customers customerId;
@@ -73,17 +74,18 @@ public class Invoices implements Serializable {
     public Invoices() {
     }
 
-    public Invoices(String invoiceNo) {
-        this.invoiceNo = invoiceNo;
+    public Invoices(Integer id) {
+        this.id = id;
     }
 
-    public Invoices(String invoiceNo, Date date, String filePath, String status, BigDecimal total, BigDecimal runningTotal) {
-        this.invoiceNo = invoiceNo;
+    public Invoices(Integer id, Date date, String filePath, String status, BigDecimal total, BigDecimal runningTotal, String invoiceNo) {
+        this.id = id;
         this.date = date;
         this.filePath = filePath;
         this.status = status;
         this.total = total;
         this.runningTotal = runningTotal;
+        this.invoiceNo = invoiceNo;
     }
 
     public Date getDate() {
@@ -92,14 +94,6 @@ public class Invoices implements Serializable {
 
     public void setDate(Date date) {
         this.date = date;
-    }
-
-    public String getInvoiceNo() {
-        return invoiceNo;
-    }
-
-    public void setInvoiceNo(String invoiceNo) {
-        this.invoiceNo = invoiceNo;
     }
 
     public String getFilePath() {
@@ -134,13 +128,20 @@ public class Invoices implements Serializable {
         this.runningTotal = runningTotal;
     }
 
-    @XmlTransient
-    public Collection<InvoiceItems> getInvoiceItemsCollection() {
-        return invoiceItemsCollection;
+    public Integer getId() {
+        return id;
     }
 
-    public void setInvoiceItemsCollection(Collection<InvoiceItems> invoiceItemsCollection) {
-        this.invoiceItemsCollection = invoiceItemsCollection;
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getInvoiceNo() {
+        return invoiceNo;
+    }
+
+    public void setInvoiceNo(String invoiceNo) {
+        this.invoiceNo = invoiceNo;
     }
 
     public Customers getCustomerId() {
@@ -154,7 +155,7 @@ public class Invoices implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (invoiceNo != null ? invoiceNo.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
@@ -165,7 +166,7 @@ public class Invoices implements Serializable {
             return false;
         }
         Invoices other = (Invoices) object;
-        if ((this.invoiceNo == null && other.invoiceNo != null) || (this.invoiceNo != null && !this.invoiceNo.equals(other.invoiceNo))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -173,7 +174,7 @@ public class Invoices implements Serializable {
 
     @Override
     public String toString() {
-        return "entity_classes.Invoices[ invoiceNo=" + invoiceNo + " ]";
+        return "entity_classes.Invoices[ id=" + id + " ]";
     }
     
 }

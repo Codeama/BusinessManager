@@ -30,14 +30,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "InvoiceItems.findAll", query = "SELECT i FROM InvoiceItems i")
     , @NamedQuery(name = "InvoiceItems.findByItemNo", query = "SELECT i FROM InvoiceItems i WHERE i.itemNo = :itemNo")
+    , @NamedQuery(name = "InvoiceItems.findByInvoiceNo", query = "SELECT i FROM InvoiceItems i WHERE i.invoiceNo = :invoiceNo")
     , @NamedQuery(name = "InvoiceItems.findByDescription", query = "SELECT i FROM InvoiceItems i WHERE i.description = :description")
-    , @NamedQuery(name = "InvoiceItems.findByQuantity", query = "SELECT i FROM InvoiceItems i WHERE i.quantity = :quantity")
     , @NamedQuery(name = "InvoiceItems.findByPrice", query = "SELECT i FROM InvoiceItems i WHERE i.price = :price")
-    , @NamedQuery(name = "InvoiceItems.findByAmount", query = "SELECT i FROM InvoiceItems i WHERE i.amount = :amount")})
+    , @NamedQuery(name = "InvoiceItems.findByAmount", query = "SELECT i FROM InvoiceItems i WHERE i.amount = :amount")
+    , @NamedQuery(name = "InvoiceItems.findByQuantity", query = "SELECT i FROM InvoiceItems i WHERE i.quantity = :quantity")})
 public class InvoiceItems implements Serializable {
-
-    @Column(name = "QUANTITY")
-    private BigDecimal quantity;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -45,6 +43,9 @@ public class InvoiceItems implements Serializable {
     @Basic(optional = false)
     @Column(name = "ITEM_NO")
     private Integer itemNo;
+    @Basic(optional = false)
+    @Column(name = "INVOICE_NO")
+    private String invoiceNo;
     @Column(name = "DESCRIPTION")
     private String description;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
@@ -54,12 +55,11 @@ public class InvoiceItems implements Serializable {
     @Basic(optional = false)
     @Column(name = "AMOUNT")
     private BigDecimal amount;
+    @Column(name = "QUANTITY")
+    private BigDecimal quantity;
     @JoinColumn(name = "CUSTOMER_ID", referencedColumnName = "CUSTOMER_ID")
     @ManyToOne(optional = false)
     private Customers customerId;
-    @JoinColumn(name = "INVOICE_NO", referencedColumnName = "INVOICE_NO")
-    @ManyToOne(optional = false)
-    private Invoices invoiceNo;
 
     public InvoiceItems() {
     }
@@ -68,8 +68,9 @@ public class InvoiceItems implements Serializable {
         this.itemNo = itemNo;
     }
 
-    public InvoiceItems(Integer itemNo, BigDecimal price, BigDecimal amount) {
+    public InvoiceItems(Integer itemNo, String invoiceNo, BigDecimal price, BigDecimal amount) {
         this.itemNo = itemNo;
+        this.invoiceNo = invoiceNo;
         this.price = price;
         this.amount = amount;
     }
@@ -82,6 +83,14 @@ public class InvoiceItems implements Serializable {
         this.itemNo = itemNo;
     }
 
+    public String getInvoiceNo() {
+        return invoiceNo;
+    }
+
+    public void setInvoiceNo(String invoiceNo) {
+        this.invoiceNo = invoiceNo;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -89,7 +98,6 @@ public class InvoiceItems implements Serializable {
     public void setDescription(String description) {
         this.description = description;
     }
-
 
     public BigDecimal getPrice() {
         return price;
@@ -107,20 +115,20 @@ public class InvoiceItems implements Serializable {
         this.amount = amount;
     }
 
+    public BigDecimal getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(BigDecimal quantity) {
+        this.quantity = quantity;
+    }
+
     public Customers getCustomerId() {
         return customerId;
     }
 
     public void setCustomerId(Customers customerId) {
         this.customerId = customerId;
-    }
-
-    public Invoices getInvoiceNo() {
-        return invoiceNo;
-    }
-
-    public void setInvoiceNo(Invoices invoiceNo) {
-        this.invoiceNo = invoiceNo;
     }
 
     @Override
@@ -146,14 +154,6 @@ public class InvoiceItems implements Serializable {
     @Override
     public String toString() {
         return "entity_classes.InvoiceItems[ itemNo=" + itemNo + " ]";
-    }
-
-    public BigDecimal getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(BigDecimal quantity) {
-        this.quantity = quantity;
     }
     
 }
