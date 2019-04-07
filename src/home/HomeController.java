@@ -59,6 +59,7 @@ public class HomeController implements Initializable, ScreenChangeListener {
         //BigDecimal current = query.setMaxResults(1).getSingleResult();
         
        List<Invoices> subTotals = getInvoiceAmount.setMaxResults(1).getResultList();
+       if(subTotals != null)
        subTotals.forEach(invoice -> {
            incomeLabel.setText(currency.format(invoice.getRunningTotal().setScale(
                 2, RoundingMode.HALF_UP)));
@@ -76,6 +77,11 @@ public class HomeController implements Initializable, ScreenChangeListener {
     @FXML
     public void goToInvoice(){
         screenController.setScreen(BusinessManager.invoiceID);
+    }
+    
+    @FXML
+    public void goToExpenses(){
+        screenController.setScreen(BusinessManager.expensesID);
     }
     
 }
