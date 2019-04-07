@@ -6,12 +6,8 @@
 package business.manager;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 /**
@@ -23,6 +19,8 @@ public class BusinessManager extends Application {
     public static String homeFxml = "Home.fxml";
     public static String invoiceID = "invoice";
     public static String invoiceFxml = "Invoice.fxml";
+    public static String expensesID = "expenses";
+    public static String expensesFxml = "Expenses.fxml";
 
     
     @Override
@@ -30,6 +28,7 @@ public class BusinessManager extends Application {
         ScreenHandler screenController = new ScreenHandler();
         screenController.loadScreen(homeID, homeFxml);
         screenController.loadScreen(invoiceID, invoiceFxml);
+        screenController.loadScreen(expensesID, expensesFxml);
         
         screenController.setScreen(homeID);
         
