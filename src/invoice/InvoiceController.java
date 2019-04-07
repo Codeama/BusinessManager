@@ -92,9 +92,9 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             "flat rate", "by hour", "by item");
     
     private RateBean rateBean = null;
-    private final InvoiceTotalBean invoiceTotalBean = new InvoiceTotalBean();
+    private TotalInvoiceBean totalInvoiceBean = new TotalInvoiceBean();
     //for aggregating invoices
-    private final InvoiceTotalBean runningTotal = new InvoiceTotalBean();
+    //private final TotalInvoiceBean runningTotal = new TotalInvoiceBean();
     
     private final NumberFormat currency = NumberFormat.getCurrencyInstance();
     
@@ -285,6 +285,11 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     }
     
     @FXML
+    public void goToExpenses(){
+        screenController.setScreen(BusinessManager.expensesID);
+    }
+    
+    @FXML
     public void addItem(){
         //identitfy flatRate form
         if(formStack.getChildren().contains(flatRateForm)
@@ -298,7 +303,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
                   loadUnitRateData();
         }
         
-        System.out.println(invoiceTotalBean.getTotalInvoice());
+        System.out.println(totalInvoiceBean.getTotalInvoice());
     }
     
     
@@ -309,8 +314,8 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             BigDecimal amount = row.getTotal();
             tableView.getItems().remove(row);
             tableView.refresh();
-            invoiceTotalBean.removeFromInvoice(amount);
-            BigDecimal total = invoiceTotalBean.getTotalInvoice();
+            totalInvoiceBean.removeFromInvoice(amount);
+            BigDecimal total = totalInvoiceBean.getTotalInvoice();
             invoiceTotal.setText(currency.format(total));//String.valueOf(itemTotal));
         }
     }
@@ -414,8 +419,10 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             amountCol.setCellFactory(tableColumn -> addCurrency());
             priceCol.setCellFactory(tableColumn -> addCurrency());
             tableView.setItems(rowContent);
-            invoiceTotalBean.addToInvoice(rateBean.getTotal());
-            BigDecimal total = invoiceTotalBean.getTotalInvoice();
+            //add to running total
+            totalInvoiceBean.addToInvoice(rateBean.getTotal());
+            BigDecimal total = totalInvoiceBean.getTotalInvoice();
+            //display on total text field
             invoiceTotal.setText(currency.format(total));
             //clear flat rate form
             flatRateDescription.clear();
@@ -435,8 +442,8 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             priceCol.setCellFactory(tableColumn -> addCurrency());
             amountCol.setCellFactory(tableColumn -> addCurrency());
             tableView.setItems(rowContent);
-            invoiceTotalBean.addToInvoice(rateBean.getTotal());
-            BigDecimal total = invoiceTotalBean.getTotalInvoice();
+            totalInvoiceBean.addToInvoice(rateBean.getTotal());
+            BigDecimal total = totalInvoiceBean.getTotalInvoice();
             invoiceTotal.setText(currency.format(total));
             //clear unit rate form
             unitDescription.clear();
@@ -506,32 +513,28 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         return dateString + timeString;
     }
     
-    public void sendInvoice(){
+    public void createInvoice(){
         EntityTransaction transaction = entityManager.getTransaction();
-        
         Customers customer;
         //checks if recipient detail is filled from Address book
-        //otherewise, record new customer
-        if(isAutoCompleted){ 
-            customer = autoCustomer;
-        }
-        else{
-            customer = addNewCustomer();
-        }
+        //otherewise, records new customer
+        if(isAutoCompleted){customer = autoCustomer;}
+        else{customer = addNewCustomer();}
+        
         entityManager.persist(customer);
         
         //aggregate income with Tax_Calculator
-        Wages wage = new Wages(); 
+        Wages wageCalculator = new Wages(); 
         if(getInvoiceAmount!=null){
             List<Invoices> subTotal = getInvoiceAmount.getResultList();
-            subTotal.forEach(invoice -> {wage.addPay(invoice.getTotal());});
+            subTotal.forEach(invoice -> {wageCalculator.addPay(invoice.getTotal());});
         }
         try{
         saveAsPDF();
         Invoices invoice = recordInvoiceDetails(customer); //invoice no., date, etc
         //fetch last record's runningTotal
-        wage.addPay(invoice.getTotal());//add current invoice total to wage
-        invoice.setRunningTotal(wage.getTotalPayToDate()); //add up all invoices to date
+        wageCalculator.addPay(invoice.getTotal());//add current invoice total to wageCalculator
+        invoice.setRunningTotal(wageCalculator.getTotalPayToDate()); //add up all invoices to date
         entityManager.persist(invoice);
         
         
@@ -550,14 +553,17 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
              transaction.begin();
              transaction.commit();
         });
+        //entityManager.close();
         
         displayAlert(AlertType.INFORMATION, 
                      "Invoice Status", 
-                     "Invoice sent!");
+                     "Invoice created!");
          }catch(Exception e){
-             displayAlert(AlertType.ERROR, "Send Failed", 
-            "Unable to send invoice: " + e);
+             displayAlert(AlertType.ERROR, "Create Invoice Failed", 
+            "Unable to create invoice: " + e);
          }
+        
+       refreshPage();
     }
     
     private Invoices recordInvoiceDetails(Customers customer){
@@ -567,12 +573,12 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         invoice.setCustomerId(customer);
         invoice.setFilePath(document.getFilePath());
         invoice.setStatus("ISSUED"); //to be reviewed with Enums
-        invoice.setTotal(invoiceTotalBean.getTotalInvoice());
+        invoice.setTotal(totalInvoiceBean.getTotalInvoice());
         
         return invoice;
     }
     
-    //use for refactoring - utility method for sendInvoice
+    //use for refactoring - utility method for createInvoice
     private void recordInvoiceItems(Customers customer, Invoices invoice){
         ObservableList<RateBean> allItems = tableView.getItems();
         allItems.forEach(item ->{
@@ -586,6 +592,16 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         });
     }
     
+    public void refreshPage(){
+        clientName.clear();
+        clientAddress.clear();
+        clientPostCode.clear();
+        clientCity.clear();
+        invoiceTotal.clear();
+        invoiceNo.setText("INV"+(currentDateTime()));
+        tableView.getItems().clear();
+        totalInvoiceBean = new TotalInvoiceBean();
+    }
     
     //to be revisited; conflicting cell editing due to two different input grids
 //    @FXML
