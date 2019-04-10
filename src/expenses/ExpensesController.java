@@ -8,14 +8,19 @@ package expenses;
 import business.manager.BusinessManager;
 import business.manager.ScreenChangeListener;
 import business.manager.ScreenHandler;
+import entity_classes.Expenses;
+import entity_classes.Invoices;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
@@ -25,7 +30,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
+//import com.bukola.*;
 
 /**
  * FXML Controller class
@@ -99,6 +107,9 @@ public class ExpensesController implements Initializable, ScreenChangeListener {
     
     private final EntityManager entityManager = 
             entityManagerFactory.createEntityManager();
+    
+    private final TypedQuery<Expenses> getExpenseAmount = 
+            entityManager.createNamedQuery("Expenses.findAll", Expenses.class);
 
 
     /**
@@ -107,6 +118,7 @@ public class ExpensesController implements Initializable, ScreenChangeListener {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+        dateField.setValue(LocalDate.now());
     }    
 
     @Override
@@ -191,5 +203,57 @@ public class ExpensesController implements Initializable, ScreenChangeListener {
             this.total.setText(currency.format(newTotal));//String.valueOf(itemTotal));
         }
     }
+    
+    @FXML
+    public void save(){
+        EntityTransaction transaction = entityManager.getTransaction();
+        ObservableList<ExpensesBean> allExpenses = tableView.getItems();
+        
+        com.bukola.Expenses calculator = new com.bukola.Expenses(); //create expense calculator
+//        if(getExpenseAmount!=null){
+//                List<Expenses> subTotal = getExpenseAmount.getResultList();
+//                subTotal.forEach(totalExpense -> {
+//                calculator.addWeeklyExpense(totalExpense.getTotal());
+//            });
+//        }
+        try{
+            allExpenses.forEach(expense -> {
+                if(getExpenseAmount!=null){
+                List<Expenses> subTotal = getExpenseAmount.getResultList();
+                subTotal.forEach(totalExpense -> {
+                calculator.addWeeklyExpense(totalExpense.getTotal());
+            });
+        }
+                Expenses expenses = new Expenses();  //creates new instance of Expenses entity
+                expenses.setDate(java.sql.Date.valueOf(dateField.getValue()));
+                expenses.setAccount(expense.getAccount()); //inserts observable list items into entity class
+                expenses.setDescription(expense.getDescription());
+                expenses.setCategory(expense.getCategory());
+                expenses.setReceipt(expense.getReciept());
+                expenses.setTotal(expense.getAmount());
+                expenses.setRunningTotal(calculator.getTotalWeeklyExpenses().add(expenses.getTotal()));
+                
+                
+
+                entityManager.persist(expenses);
+                transaction.begin();
+                transaction.commit();
+            });
+            displayAlert(Alert.AlertType.INFORMATION, 
+                         "Expenses Status", 
+                         "Expenses saved!");
+        }
+        catch(Exception e){
+             displayAlert(Alert.AlertType.ERROR, "Save Expenses Failed", 
+            "Unable to save expenses: " + e);
+        }
+    }
+    private void displayAlert(
+      Alert.AlertType type, String title, String message) {
+      Alert alert = new Alert(type);
+      alert.setTitle(title);
+      alert.setContentText(message);
+      alert.showAndWait();
+   }
     
 }
