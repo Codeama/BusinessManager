@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package invoice;
+package expenses;
 
 import java.math.BigDecimal;
 import javafx.beans.binding.ObjectBinding;
@@ -13,12 +13,12 @@ import javafx.beans.property.SimpleObjectProperty;
  *
  * @author BUKOLA
  */
-public class InvoiceTotalBean {
-    private SimpleObjectProperty<BigDecimal> invoiceTotal;
+public class TotalExpensesBean {
+    private SimpleObjectProperty<BigDecimal> totalExpenses;
     private BigDecimal total = new BigDecimal(0);
     
-    public InvoiceTotalBean(){
-        invoiceTotal = new SimpleObjectProperty(BigDecimal.ZERO);
+    public TotalExpensesBean(){
+        totalExpenses = new SimpleObjectProperty(BigDecimal.ZERO);
         
     }
     
@@ -26,8 +26,8 @@ public class InvoiceTotalBean {
      * 
      * @return total value of an invoice
      */
-    public BigDecimal getTotalInvoice(){
-        return invoiceTotal.get();
+    public BigDecimal getTotalExpenses(){
+        return totalExpenses.get();
     }
     
     /**
@@ -36,7 +36,7 @@ public class InvoiceTotalBean {
      * @see RateBean#getTotal() 
      * 
      */
-    public void addToInvoice(BigDecimal itemTotal){
+    public void addToExpenses(BigDecimal itemTotal){
         ObjectBinding<BigDecimal> sumTotal= new ObjectBinding(){
             @Override
             protected BigDecimal computeValue() {
@@ -44,11 +44,11 @@ public class InvoiceTotalBean {
                 return total;
             }
         };
-        invoiceTotal.bind(sumTotal);
+        totalExpenses.bind(sumTotal);
        // return invoiceTotal.get();
     }
     
-    public void removeFromInvoice(BigDecimal itemTotal){
+    public void removeFromExpenses(BigDecimal itemTotal){
         ObjectBinding<BigDecimal> subtractTotal = new ObjectBinding(){
             @Override
             protected BigDecimal computeValue() {
@@ -56,7 +56,7 @@ public class InvoiceTotalBean {
                 return total;
             }
         };
-        invoiceTotal.bind(subtractTotal);
+        totalExpenses.bind(subtractTotal);
        // return invoiceTotal.get();
     }
     

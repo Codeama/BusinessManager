@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -13,12 +12,12 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="home.HomeController">
    <children>
-      <VBox layoutY="2.0" prefHeight="650.0" prefWidth="200.0" style="-fx-background-color: #4F91D3;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox id="navbar" layoutY="2.0" prefHeight="650.0" prefWidth="200.0" stylesheets="@home.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Pane prefHeight="200.0" prefWidth="200.0" />
+            <Pane id="profile" prefHeight="200.0" prefWidth="200.0" stylesheets="@home.css" />
             <Button mnemonicParsing="false" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Home" />
             <Button mnemonicParsing="false" onAction="#goToInvoice" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Invoice" />
-            <Button mnemonicParsing="false" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Expenses" />
+            <Button mnemonicParsing="false" onAction="#goToExpenses" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Expenses" />
             <Button mnemonicParsing="false" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Earnings" />
             <Button mnemonicParsing="false" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Tax" />
             <Button mnemonicParsing="false" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Summary" />
@@ -27,7 +26,7 @@
       </VBox>
       <AnchorPane layoutX="198.0" prefHeight="543.0" prefWidth="582.0">
          <children>
-            <GridPane layoutY="180.0" prefHeight="316.0" prefWidth="548.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="17.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="150.0">
+            <GridPane layoutY="180.0" prefHeight="316.0" prefWidth="548.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="17.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="150.0">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -39,16 +38,16 @@
                   <RowConstraints minHeight="10.0" prefHeight="15.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Label fx:id="incomeLabel" contentDisplay="CENTER" text="Label" GridPane.rowIndex="1">
+                  <Label fx:id="expensesLabel" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <font>
-                        <Font size="30.0" />
-                     </font>
-                     <padding>
-                        <Insets left="50.0" />
-                     </padding></Label>
-                  <Label text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                  <Label text="Label" GridPane.rowIndex="3" />
+                        <Font size="18.0" />
+                     </font></Label>
+                  <Label fx:id="incomeLabel" contentDisplay="CENTER" GridPane.rowIndex="1">
+                     <font>
+                        <Font size="18.0" />
+                     </font></Label>
+                  <Label fx:id="taxLabel" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <Label fx:id="profitLabel" GridPane.rowIndex="3" />
                   <Label prefHeight="87.0" prefWidth="274.0" text="Estimated Tax" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   <Label prefHeight="87.0" prefWidth="274.0" text="Profit &amp; Loss" GridPane.rowIndex="2" />
                   <Label prefHeight="87.0" prefWidth="274.0" text="Expenses" GridPane.columnIndex="1" />
@@ -57,7 +56,7 @@
             </GridPane>
             <AnchorPane layoutX="1.0" prefHeight="79.0" prefWidth="582.0">
                <children>
-                  <Label id="header" layoutX="90.0" layoutY="28.0" prefHeight="51.0" prefWidth="319.0" stylesheets="@home.css" text="Business Account Manager" textAlignment="CENTER" AnchorPane.topAnchor="28.0" />
+                  <Label id="header" layoutX="90.0" layoutY="28.0" prefHeight="51.0" prefWidth="705.0" stylesheets="@home.css" text="Business Account Manager" textAlignment="CENTER" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0" />
                </children>
             </AnchorPane>
          </children>

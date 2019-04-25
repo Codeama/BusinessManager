@@ -530,34 +530,34 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             subTotal.forEach(invoice -> {wageCalculator.addPay(invoice.getTotal());});
         }
         try{
-        saveAsPDF();
-        Invoices invoice = recordInvoiceDetails(customer); //invoice no., date, etc
-        //fetch last record's runningTotal
-        wageCalculator.addPay(invoice.getTotal());//add current invoice total to wageCalculator
-        invoice.setRunningTotal(wageCalculator.getTotalPayToDate()); //add up all invoices to date
-        entityManager.persist(invoice);
-        
-        
-        ObservableList<RateBean> allItems = tableView.getItems();//
-        allItems.forEach(item ->{
-            InvoiceItems invoiceItem = new InvoiceItems();
-            invoiceItem.setInvoiceNo(invoiceNo.getText());
-            invoiceItem.setCustomerId(customer);
-            invoiceItem.setDescription(item.getDescription());
-            invoiceItem.setQuantity(item.getQuantity());
-            invoiceItem.setPrice(item.getPrice());
-            invoiceItem.setAmount(item.getTotal());
-            
-             entityManager.persist(invoiceItem);
-             
-             transaction.begin();
-             transaction.commit();
-        });
-        //entityManager.close();
-        
-        displayAlert(AlertType.INFORMATION, 
-                     "Invoice Status", 
-                     "Invoice created!");
+            saveAsPDF();
+            Invoices invoice = recordInvoiceDetails(customer); //invoice no., date, etc
+            //fetch last record's runningTotal
+            wageCalculator.addPay(invoice.getTotal());//add current invoice total to wageCalculator
+            invoice.setRunningTotal(wageCalculator.getTotalPayToDate()); //add up all invoices to date
+            entityManager.persist(invoice);
+
+
+            ObservableList<RateBean> allItems = tableView.getItems();//
+            allItems.forEach(item ->{
+                InvoiceItems invoiceItem = new InvoiceItems();
+                invoiceItem.setInvoiceNo(invoiceNo.getText()); //FK
+                invoiceItem.setCustomerId(customer);
+                invoiceItem.setDescription(item.getDescription());
+                invoiceItem.setQuantity(item.getQuantity());
+                invoiceItem.setPrice(item.getPrice());
+                invoiceItem.setAmount(item.getTotal());
+
+                 entityManager.persist(invoiceItem);
+
+                 transaction.begin();
+                 transaction.commit();
+            });
+            //entityManager.close();
+
+            displayAlert(AlertType.INFORMATION, 
+                         "Invoice Status", 
+                         "Invoice created!");
          }catch(Exception e){
              displayAlert(AlertType.ERROR, "Create Invoice Failed", 
             "Unable to create invoice: " + e);

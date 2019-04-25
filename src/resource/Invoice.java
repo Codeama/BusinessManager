@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package invoice;
+package resource;
 
 import entity_classes.Customers;
 import entity_classes.Invoices;

@@ -3,8 +3,9 @@
  */
 
 .button{
-    -fx-background-color: #4F91D3;
-    
+    -fx-background-color: #8B008B;
+    -fx-width: 200;
+    -fx-height: 58;
     -fx-text-fill: white;
     -fx-font-weight: semi-bold;
     -fx-alignment: baseline-left;
@@ -13,7 +14,7 @@
     -fx-label-padding: 5 0 0 0;
     -fx-padding: 0 0 0 50;
     -fx-border: none;
-    -fx-border-color: #4F91D3;
+    -fx-border-color: #8B008B;
    
 }
 .button:hover{
@@ -23,12 +24,21 @@
     -fx-alignment: center;
     -fx-font-size: 20;
     -fx-text-alignment: center;
-    -fx-alignment: baseline-left;
+    -fx-alignment: center;
+    -fx-font-weight: bold;
 }
 
 #homepage-label{
     -fx-font: arial;
     -fx-font-size: 18;
+}
+
+#profile{
+    -fx-background-color: #4F91D3;
+}
+
+#navbar{
+    -fx-background-color: #8B008B;
 }
 
 .mainFxmlClass {

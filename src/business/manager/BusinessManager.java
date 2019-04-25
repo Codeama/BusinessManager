@@ -31,6 +31,7 @@ public class BusinessManager extends Application {
         screenController.loadScreen(expensesID, expensesFxml);
         
         screenController.setScreen(homeID);
+        //screenController.setScreen(expensesID);
         
         Group root = new Group();
         root.getChildren().addAll(screenController);

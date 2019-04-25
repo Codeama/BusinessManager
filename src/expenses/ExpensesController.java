@@ -221,7 +221,7 @@ public class ExpensesController implements Initializable, ScreenChangeListener {
                 if(getExpenseAmount!=null){
                 List<Expenses> subTotal = getExpenseAmount.getResultList();
                 subTotal.forEach(totalExpense -> {
-                calculator.addWeeklyExpense(totalExpense.getTotal());
+                calculator.addExpense(totalExpense.getTotal());
             });
         }
                 Expenses expenses = new Expenses();  //creates new instance of Expenses entity
@@ -231,7 +231,7 @@ public class ExpensesController implements Initializable, ScreenChangeListener {
                 expenses.setCategory(expense.getCategory());
                 expenses.setReceipt(expense.getReciept());
                 expenses.setTotal(expense.getAmount());
-                expenses.setRunningTotal(calculator.getTotalWeeklyExpenses().add(expenses.getTotal()));
+                expenses.setRunningTotal(calculator.getTotalExpenses().add(expenses.getTotal()));
                 
                 
 

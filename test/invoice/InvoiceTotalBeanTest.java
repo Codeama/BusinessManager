@@ -20,7 +20,7 @@ import org.junit.Before;
 public class InvoiceTotalBeanTest {
     
    
-    InvoiceTotalBean invoiceTotalBean = new InvoiceTotalBean();
+    TotalInvoiceBean invoiceTotalBean = new TotalInvoiceBean();
     
     
     @Test
@@ -31,7 +31,7 @@ public class InvoiceTotalBeanTest {
     }
 
     /**
-     * Test of addToInvoice method, of class InvoiceTotalBean.
+     * Test of addToInvoice method, of class TotalInvoiceBean.
      */
     @Test
     public void testAddToInvoice() {
@@ -48,7 +48,7 @@ public class InvoiceTotalBeanTest {
     
 
     /**
-     * Test of removeFromInvoice method, of class InvoiceTotalBean.
+     * Test of removeFromInvoice method, of class TotalInvoiceBean.
      */
     @Test
     public void testRemoveFromInvoice() {

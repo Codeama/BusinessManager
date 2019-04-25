@@ -11,6 +11,8 @@ import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -28,20 +30,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Expenses.findAll", query = "SELECT e FROM Expenses e")
-    , @NamedQuery(name = "Expenses.findById", query = "SELECT e FROM Expenses e WHERE e.id = :id")
     , @NamedQuery(name = "Expenses.findByDate", query = "SELECT e FROM Expenses e WHERE e.date = :date")
     , @NamedQuery(name = "Expenses.findByDescription", query = "SELECT e FROM Expenses e WHERE e.description = :description")
     , @NamedQuery(name = "Expenses.findByCategory", query = "SELECT e FROM Expenses e WHERE e.category = :category")
     , @NamedQuery(name = "Expenses.findByReceipt", query = "SELECT e FROM Expenses e WHERE e.receipt = :receipt")
     , @NamedQuery(name = "Expenses.findByTotal", query = "SELECT e FROM Expenses e WHERE e.total = :total")
-    , @NamedQuery(name = "Expenses.findByRunningTotal", query = "SELECT e FROM Expenses e WHERE e.runningTotal = :runningTotal")})
+    , @NamedQuery(name = "Expenses.findByRunningTotal", query = "SELECT e FROM Expenses e WHERE e.runningTotal = :runningTotal")
+    , @NamedQuery(name = "Expenses.findByAccount", query = "SELECT e FROM Expenses e WHERE e.account = :account")
+    , @NamedQuery(name = "Expenses.findById", query = "SELECT e FROM Expenses e WHERE e.id = :id")})
 public class Expenses implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @Id
-    @Basic(optional = false)
-    @Column(name = "ID")
-    private Integer id;
     @Basic(optional = false)
     @Column(name = "DATE")
     @Temporal(TemporalType.DATE)
@@ -60,6 +59,13 @@ public class Expenses implements Serializable {
     @Basic(optional = false)
     @Column(name = "RUNNING_TOTAL")
     private BigDecimal runningTotal;
+    @Column(name = "ACCOUNT")
+    private String account;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "ID")
+    private Integer id;
 
     public Expenses() {
     }
@@ -74,14 +80,6 @@ public class Expenses implements Serializable {
         this.description = description;
         this.total = total;
         this.runningTotal = runningTotal;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public Date getDate() {
@@ -130,6 +128,22 @@ public class Expenses implements Serializable {
 
     public void setRunningTotal(BigDecimal runningTotal) {
         this.runningTotal = runningTotal;
+    }
+
+    public String getAccount() {
+        return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     @Override
