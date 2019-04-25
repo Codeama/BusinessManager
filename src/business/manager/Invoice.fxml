@@ -37,21 +37,11 @@
             <Button mnemonicParsing="false" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Archive" />
          </children>
       </VBox>
-      <Label id="header" layoutX="200.0" prefHeight="66.0" prefWidth="217.0" text="Invoices" AnchorPane.bottomAnchor="584.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="583.0" AnchorPane.topAnchor="0.0">
-         <stylesheets>
-            <URL value="@invoice.css" />
-            <URL value="@home.css" />
-         </stylesheets>
-      </Label>
+      <Label id="header" layoutX="200.0" prefHeight="66.0" prefWidth="800.0" stylesheets="@home.css" text="Invoices" AnchorPane.bottomAnchor="584.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
       <AnchorPane layoutX="200.0" layoutY="100.0" prefHeight="650.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="70.0">
          <children>
             <TabPane prefHeight="650.0" prefWidth="582.0" style="-fx-background-color: white;" stylesheets="@invoice.css" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <tabs>
-                <Tab text="Manage Invoices">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="457.0" prefWidth="582.0" />
-                  </content>
-                </Tab>
                 <Tab text="Create Invoice">
                   <content>
                     <AnchorPane maxHeight="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="650.0" prefWidth="200.0" style="-fx-background-color: #d9dce0;">
@@ -235,6 +225,11 @@
                               </GridPane>
                            </children>
                         </AnchorPane>
+                  </content>
+                </Tab>
+                <Tab text="Manage Invoices">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="457.0" prefWidth="582.0" />
                   </content>
                 </Tab>
                   <Tab text="Drafts">
