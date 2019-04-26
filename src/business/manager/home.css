@@ -22,7 +22,9 @@
 }
 
 #selectedButton{
-    -fx-background-color: #4F91D3;
+    
+    -fx-border-color: #4F91D3;
+    -fx-border-width: 0 0 0 5;
 }
 
 #header{
@@ -33,9 +35,16 @@
     -fx-font-weight: bold;
 }
 
+#pane{
+    -fx-background-color: white;
+    -fx-effect: dropshadow(three-pass-box, #DCDCDC, 0.0, 25.0, 3.0,  5.0);
+}
+
 #homepage-label{
     -fx-font: arial;
     -fx-font-size: 18;
+    -fx-font-weight: semi-bold;
+    -fx-alignment: center;
 }
 
 #profile{
@@ -45,6 +54,10 @@
 #navbar{
     -fx-background-color: #8B008B;
 }
+
+/*#home-grid{
+    -fx-background-color: #DCDCDC;
+}*/
 
 
 .mainFxmlClass {
