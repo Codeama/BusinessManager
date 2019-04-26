@@ -20,6 +20,10 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Circle;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -41,6 +45,12 @@ public class HomeController implements Initializable, ScreenChangeListener {
     private Label expensesLabel;
      @FXML
     private Label profitLabel;
+     
+     @FXML
+     private Circle homeProfile;
+     
+     @FXML
+     private ImageView imageView;
     
     //queries
      private final EntityManagerFactory entityManagerFactory =
@@ -81,6 +91,11 @@ public class HomeController implements Initializable, ScreenChangeListener {
        
        System.out.println(getExpenseAmount);
        queryAndDisplayProfits();
+       
+       //PROFILE IMAGE
+       //Image image = new Image("initial.png");
+       imageView.setImage(new Image(getClass().getResourceAsStream("initial.png")));
+       //homeProfile.setFill(new ImagePattern(new Image("initial.png")));
     }    
 
     @Override

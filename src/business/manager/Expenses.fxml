@@ -15,12 +15,16 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
 
 <AnchorPane id="AnchorPane" prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="expenses.ExpensesController">
    <children>
       <VBox id="navbar" prefHeight="650.0" prefWidth="200.0" stylesheets="@home.css" AnchorPane.rightAnchor="800.0">
          <children>
-            <Pane id="profile" prefHeight="200.0" prefWidth="200.0" stylesheets="@home.css" />
+            <Pane id="profile" prefHeight="200.0" prefWidth="200.0" stylesheets="@home.css">
+               <children>
+                  <Circle fx:id="expensesProfile" fill="WHITE" layoutX="100.0" layoutY="100.0" radius="74.0" strokeType="INSIDE" />
+               </children></Pane>
             <Button mnemonicParsing="false" onAction="#goToHome" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Home" />
             <Button mnemonicParsing="false" onAction="#goToInvoice" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Invoices" />
             <Button id="selectedButton" mnemonicParsing="false" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Expenses" />
