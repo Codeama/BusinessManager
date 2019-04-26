@@ -23,7 +23,7 @@
             <Pane id="profile" prefHeight="200.0" prefWidth="200.0" stylesheets="@home.css" />
             <Button mnemonicParsing="false" onAction="#goToHome" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Home" />
             <Button mnemonicParsing="false" onAction="#goToInvoice" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Invoices" />
-            <Button blendMode="ADD" mnemonicParsing="false" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Expenses" />
+            <Button id="selectedButton" mnemonicParsing="false" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Expenses" />
             <Button mnemonicParsing="false" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Earnings" />
             <Button mnemonicParsing="false" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Tax" />
             <Button mnemonicParsing="false" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Summary" />

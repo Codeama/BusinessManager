@@ -20,6 +20,11 @@
 .button:hover{
     -fx-background-color: #4F91D3;
 }
+
+#selectedButton{
+    -fx-background-color: #4F91D3;
+}
+
 #header{
     -fx-alignment: center;
     -fx-font-size: 20;
@@ -40,6 +45,7 @@
 #navbar{
     -fx-background-color: #8B008B;
 }
+
 
 .mainFxmlClass {
 

@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -29,7 +30,7 @@
          <children>
             <Pane id="profile" prefHeight="200.0" prefWidth="200.0" />
             <Button mnemonicParsing="false" onAction="#goToHome" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Home" />
-            <Button blendMode="ADD" mnemonicParsing="false" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Invoice" />
+            <Button id="selectedButton" mnemonicParsing="false" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Invoice" />
             <Button mnemonicParsing="false" onAction="#goToExpenses" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Expenses" />
             <Button mnemonicParsing="false" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Earnings" />
             <Button mnemonicParsing="false" prefHeight="58.0" prefWidth="200.0" stylesheets="@home.css" text="Tax" />
@@ -229,7 +230,32 @@
                 </Tab>
                 <Tab text="Manage Invoices">
                   <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="457.0" prefWidth="582.0" />
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="457.0" prefWidth="582.0">
+                           <children>
+                              <Pagination layoutX="200.0" layoutY="90.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
+                              <AnchorPane layoutX="151.0" layoutY="91.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
+                                 <children>
+                                    <TableView prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                      <columns>
+                                          <TableColumn prefWidth="98.0" text="Date" />
+                                          <TableColumn prefWidth="161.0" text="Invoice no." />
+                                          <TableColumn minWidth="0.0" prefWidth="186.0" text="Recipient" />
+                                        <TableColumn prefWidth="99.0" text="Status" />
+                                        <TableColumn prefWidth="125.0" text="Action" />
+                                          <TableColumn prefWidth="123.0" text="Amount" />
+                                      </columns>
+                                    </TableView>
+                                 </children>
+                              </AnchorPane>
+                              <Label alignment="BOTTOM_LEFT" layoutX="264.0" layoutY="14.0" text="Manage Invoices" AnchorPane.bottomAnchor="510.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <font>
+                                    <Font name="System Bold" size="18.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets bottom="5.0" />
+                                 </padding>
+                              </Label>
+                           </children></AnchorPane>
                   </content>
                 </Tab>
                   <Tab text="Drafts">

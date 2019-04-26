@@ -433,7 +433,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     
     
     private void loadUnitRateData(){
-        if(rateBean != null){ //null from exception handling
+        if(rateBean != null){ //might be null from exception handling
             rowContent.add(rateBean);
             descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
             amountCol.setCellValueFactory(new PropertyValueFactory<>("total"));
