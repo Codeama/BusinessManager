@@ -34,6 +34,7 @@ import javax.persistence.*;
 
 import org.controlsfx.control.textfield.TextFields;
 import com.bukola.*; //Tax Calculator API
+import java.util.Date;
 /**
  * FXML Controller class
  *
@@ -111,7 +112,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             entityManager.createNamedQuery(
             "Customers.findAll", Customers.class);
     
-    private final TypedQuery<Invoices> getInvoiceAmount = 
+    private final TypedQuery<Invoices> getAllInvoices = 
             entityManager.createNamedQuery("Invoices.findAll", Invoices.class);
     
     Customers autoCustomer;
@@ -120,6 +121,17 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
    //         "Customers.findByCustomerName", Customers.class);
     
     boolean isAutoCompleted; //to check autocompletion of Invoice recipient
+    
+    //MANAGE INVOICES
+    @FXML private Pagination pagination;
+    @FXML private TableView<Invoices> paginationTableView;
+    ObservableList<Invoices> invoiceList = FXCollections.observableArrayList();
+    @FXML private TableColumn<Invoices, Date> dateCreated;
+    @FXML private TableColumn<Invoices, String> invoiceNumber;
+    @FXML private TableColumn<Customers, String> recipient;
+    @FXML private TableColumn<Invoices, String> status;
+    @FXML private TableColumn<Invoices, String> action;
+    @FXML private TableColumn<Invoices, BigDecimal> amount;
     
     
     /**
@@ -181,6 +193,28 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         
         //tableView editing mode (delete)
         //amountCol.setCellFactory(ButtonTableCell.forTableColumn());
+        
+        //Print all invoices
+        getAllInvoices.getResultList().stream().forEach((invoice) -> {
+            System.out.printf("%s\t%s\t%s\t%s\t%s\t%s%n", invoice.getDate(), invoice.getInvoiceNo(),
+                    invoice.getCustomerId().getCustomerName(), invoice.getStatus(),
+                    invoice.getFilePath(), invoice.getTotal() );
+        });
+    
+//        paginationTableView.setItems(invoiceList);
+//        paginationTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        
+        invoiceList.addAll(getAllInvoices.getResultList());
+        paginationTableView.setItems(invoiceList);
+        dateCreated.setCellValueFactory(new PropertyValueFactory<>("date"));
+        invoiceNumber.setCellValueFactory(new PropertyValueFactory<>("invoiceNo"));
+        status.setCellValueFactory(new PropertyValueFactory<>("status"));
+        //recipient.setCellValueFactory(new PropertyValueFactory<>("customerId"));
+        //status.setCellValueFactory(new PropertyValueFactory<>("runningTotal"));
+//       // action.setCellValueFactory(new PropertyValueFactory<>("action"));
+        amount.setCellValueFactory(new PropertyValueFactory<>("total"));
+//    
     }
 
     
@@ -412,8 +446,8 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     
     private void loadFlatRateData(){
         if(rateBean != null){ //null from exception handling @see createFlatRateBean()
-            rowContent.add(rateBean);
-            descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
+            rowContent.add(rateBean); //add data to observableList
+            descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));//display data ontableView
             priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
             amountCol.setCellValueFactory(new PropertyValueFactory<>("total"));
             amountCol.setCellFactory(tableColumn -> addCurrency());
@@ -525,8 +559,8 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         
         //aggregate income with Tax_Calculator
         Wages wageCalculator = new Wages(); 
-        if(getInvoiceAmount!=null){
-            List<Invoices> subTotal = getInvoiceAmount.getResultList();
+        if(getAllInvoices!=null){
+            List<Invoices> subTotal = getAllInvoices.getResultList();
             subTotal.forEach(invoice -> {wageCalculator.addPay(invoice.getTotal());});
         }
         try{
