@@ -44,53 +44,37 @@ public class ExpensesController implements Initializable, ScreenChangeListener {
     
     ScreenHandler screenController;
     
-     @FXML
-    private DatePicker dateField;
+    @FXML private DatePicker dateField;
 
-    @FXML
-    private TableView<ExpensesBean> tableView;
+    @FXML private TableView<ExpensesBean> tableView;
 
-    @FXML
-    private TextField account;
+    @FXML private TextField account;
 
-    @FXML
-    private TextField category;
+    @FXML private TextField category;
 
-    @FXML
-    private TextField description;
+    @FXML private TextField description;
 
-    @FXML
-    private TextField receipt;
+    @FXML private TextField receipt;
 
-    @FXML
-    private TextField amount;
+    @FXML private TextField amount;
 
-    @FXML
-    private Button addButton;
+    @FXML private Button addButton;
 
-    @FXML
-    private TextField total;
+    @FXML private TextField total;
 
-    @FXML
-    private Button saveButton;
+    @FXML private Button saveButton;
 
-    @FXML
-    private Button deleteButton;
+    @FXML private Button deleteButton;
     
-     @FXML
-    private TableColumn<ExpensesBean, String> accountCol;
+    @FXML private TableColumn<ExpensesBean, String> accountCol;
 
-    @FXML
-    private TableColumn<ExpensesBean, String> categoryCol;
+    @FXML private TableColumn<ExpensesBean, String> categoryCol;
 
-    @FXML
-    private TableColumn<ExpensesBean, String> descriptionCol;
+    @FXML private TableColumn<ExpensesBean, String> descriptionCol;
 
-    @FXML
-    private TableColumn<ExpensesBean, String> receiptCol;
+    @FXML private TableColumn<ExpensesBean, String> receiptCol;
 
-    @FXML
-    private TableColumn<ExpensesBean, BigDecimal> amountCol;
+    @FXML private TableColumn<ExpensesBean, BigDecimal> amountCol;
     
     private ObservableList<ExpensesBean> expenseRow = 
             FXCollections.observableArrayList();
@@ -127,18 +111,15 @@ public class ExpensesController implements Initializable, ScreenChangeListener {
     }
     
     //===Menu NAVIGATION======
-    @FXML
-    public void goToHome(){
+    @FXML public void goToHome(){
         screenController.setScreen(BusinessManager.homeID);
     }
     
-    @FXML
-    public void goToInvoice(){
+    @FXML public void goToInvoice(){
         screenController.setScreen(BusinessManager.invoiceID);
     }
     
-    @FXML
-    public void addToExpenses(){
+    @FXML public void addToExpenses(){
         if(account.getText() != null && description.getText() != null 
                 && amount.getText()!= null){
             try{
@@ -191,8 +172,7 @@ public class ExpensesController implements Initializable, ScreenChangeListener {
         return tableCell;
     }
     
-    @FXML
-    public void removeFromExpenses(){
+    @FXML public void removeFromExpenses(){
         if(!tableView.getSelectionModel().isEmpty()){
             ExpensesBean row = tableView.getSelectionModel().getSelectedItem();
             BigDecimal rowAmount = row.getAmount();
@@ -204,8 +184,7 @@ public class ExpensesController implements Initializable, ScreenChangeListener {
         }
     }
     
-    @FXML
-    public void save(){
+    @FXML public void save(){
         EntityTransaction transaction = entityManager.getTransaction();
         ObservableList<ExpensesBean> allExpenses = tableView.getItems();
         
