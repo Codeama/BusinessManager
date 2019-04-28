@@ -468,7 +468,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     
     private void loadUnitRateData(){
         if(rateBean != null){ //might be null from exception handling
-            rowContent.add(rateBean);
+            rowContent.add(rateBean); //load content on to ObservableList
             descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
             amountCol.setCellValueFactory(new PropertyValueFactory<>("total"));
             quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
@@ -500,17 +500,42 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     };
     return tableCell;
 }
+    /**
+     * To avoid duplicate email address and in sync with UNIQUE constraint
+     * on the Email_Address column of the Customer table, 
+     * this checks new email entry whether the email address already exists
+     * @return returns true or false
+     */
+    private boolean customerExists(){
+        TypedQuery<Customers> findByEmail = 
+         entityManager.createNamedQuery(
+            "Customers.findByEmailAddress", Customers.class);
+        findByEmail.setParameter("emailAddress", clientEmail.getText());
+        //findByEmail.getResultList().stream().forEach(email-> {System.out.println(email.getEmailAddress());});
+        return findByEmail.getResultList().isEmpty();
+    }
+    /**
+     * checks invoice form isn't empty when user clicks "create invoice"
+     * tests rateBean for value as that is the data model which only gets
+     * initialized with value when an entry is made
+     * @see #createUnitRateBean()
+     * @return returns true or false
+    */
+    public boolean isInvoiceEmpty(){
+        return rateBean == null;
+    } 
     
     
 
     public Customers addNewCustomer(){
+       
         //get recipient details and save in customer table
         Customers customer = new Customers();
         customer.setCustomerName(clientName.getText());
         customer.setAddressLine1(clientAddress.getText());
         customer.setPostCode(clientPostCode.getText());
         customer.setCity(clientCity.getText());
-        //customer.setPhoneNumber(clientPhoneNumber);
+        customer.setEmailAddress(clientEmail.getText());
         return customer;
     }
     
@@ -531,6 +556,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             clientAddress.setText(customer.getAddressLine1());
             clientCity.setText(customer.getCity());
             clientPostCode.setText(customer.getPostCode());
+            clientEmail.setText(customer.getEmailAddress());
             isAutoCompleted = true;
             autoCustomer = customer;
         });
@@ -548,6 +574,13 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     }
     
     public void createInvoice(){
+        if(isInvoiceEmpty()){
+            displayAlert(AlertType.WARNING, 
+                         "Invoice Form", 
+                         "You can't send an empty invoice");
+        }
+        else{
+
         EntityTransaction transaction = entityManager.getTransaction();
         Customers customer;
         //checks if recipient detail is filled from Address book
@@ -597,7 +630,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             "Unable to create invoice: " + e);
          }
         
-       refreshPage();
+       refreshPage();}
     }
     
     private Invoices recordInvoiceDetails(Customers customer){
@@ -634,7 +667,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         invoiceTotal.clear();
         invoiceNo.setText("INV"+(currentDateTime()));
         tableView.getItems().clear();
-        totalInvoiceBean = new TotalInvoiceBean();
+        totalInvoiceBean = new TotalInvoiceBean();//reinitialize
     }
     
     //to be revisited; conflicting cell editing due to two different input grids
