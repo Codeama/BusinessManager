@@ -34,6 +34,7 @@ import javax.persistence.*;
 
 import org.controlsfx.control.textfield.TextFields;
 import com.bukola.*; //Tax Calculator API
+import java.text.SimpleDateFormat;
 import java.util.Date;
 /**
  * FXML Controller class
@@ -210,6 +211,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         dateCreated.setCellValueFactory(new PropertyValueFactory<>("date"));
         invoiceNumber.setCellValueFactory(new PropertyValueFactory<>("invoiceNo"));
         status.setCellValueFactory(new PropertyValueFactory<>("status"));
+        dateCreated.setCellFactory(tableColumn -> dateFormat());
         //recipient.setCellValueFactory(new PropertyValueFactory<>("customerId"));
         //status.setCellValueFactory(new PropertyValueFactory<>("runningTotal"));
 //       // action.setCellValueFactory(new PropertyValueFactory<>("action"));
@@ -489,17 +491,17 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     
     //utility method for displaying currency symbol in tableView cells
     private TableCell<RateBean, BigDecimal> addCurrency(){
-    TableCell<RateBean, BigDecimal> tableCell = new TableCell<RateBean, BigDecimal>(){
-        @Override
-        protected void updateItem(BigDecimal value, boolean empty){
-            super.updateItem(value, empty);
-            if (!empty) {
-                setText(currency.format(value));
+        TableCell<RateBean, BigDecimal> tableCell = new TableCell<RateBean, BigDecimal>(){
+            @Override
+            protected void updateItem(BigDecimal value, boolean empty){
+                super.updateItem(value, empty);
+                if (!empty) {
+                    setText(currency.format(value));
+                }
             }
-        }
-    };
+        };
     return tableCell;
-}
+    }
     /**
      * To avoid duplicate email address and in sync with UNIQUE constraint
      * on the Email_Address column of the Customer table, 
@@ -512,7 +514,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             "Customers.findByEmailAddress", Customers.class);
         findByEmail.setParameter("emailAddress", clientEmail.getText());
         //findByEmail.getResultList().stream().forEach(email-> {System.out.println(email.getEmailAddress());});
-        return findByEmail.getResultList().isEmpty();
+        return !findByEmail.getResultList().isEmpty();//checks if returned list isn't empty
     }
     /**
      * checks invoice form isn't empty when user clicks "create invoice"
@@ -524,6 +526,20 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     public boolean isInvoiceEmpty(){
         return rateBean == null;
     } 
+    
+    /**
+     * checks if invoice no. already exists if customer wants to create 
+     * invoices consecutively
+     * @return returns true or false
+     */
+    public boolean invoiceNoExists(){
+        TypedQuery<Invoices> findInvoiceNo = 
+         entityManager.createNamedQuery(
+            "Invoices.findByInvoiceNo", Invoices.class);
+        findInvoiceNo.setParameter("invoiceNo", invoiceNo.getText());
+        //System.out.println("Invoice no exist? : "+ findInvoiceNo.getResultList().isEmpty());
+        return !findInvoiceNo.getResultList().isEmpty(); //checks if list isn't empty
+    }
     
     
 
@@ -574,10 +590,18 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     }
     
     public void createInvoice(){
+        //handle empty invoice when user clicks "create button"
         if(isInvoiceEmpty()){
             displayAlert(AlertType.WARNING, 
                          "Invoice Form", 
                          "You can't send an empty invoice");
+        }
+        //handle duplicate invoice number
+        else if(invoiceNoExists()){
+            displayAlert(AlertType.WARNING, 
+                         "Invoice Form", 
+                         "Invoice Number has already been used.");
+            invoiceNo.requestFocus();
         }
         else{
 
@@ -669,6 +693,22 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         tableView.getItems().clear();
         totalInvoiceBean = new TotalInvoiceBean();//reinitialize
     }
+    
+        //utility method for displaying currency symbol in tableView cells
+    private TableCell<Invoices, Date> dateFormat(){
+        TableCell<Invoices, Date> tableCell = new TableCell<Invoices, Date>(){
+            private SimpleDateFormat format = new SimpleDateFormat("dd MMM yyyy");
+            @Override
+            protected void updateItem(Date dateOnRecord, boolean empty){
+                super.updateItem(dateOnRecord, empty);
+                if (!empty) {
+                    setText(format.format(dateOnRecord));
+                }
+            }
+        };
+        return tableCell;
+    }
+
     
     //to be revisited; conflicting cell editing due to two different input grids
 //    @FXML
