@@ -212,10 +212,12 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         invoiceNumber.setCellValueFactory(new PropertyValueFactory<>("invoiceNo"));
         status.setCellValueFactory(new PropertyValueFactory<>("status"));
         dateCreated.setCellFactory(tableColumn -> dateFormat());
+        
         //recipient.setCellValueFactory(new PropertyValueFactory<>("customerId"));
         //status.setCellValueFactory(new PropertyValueFactory<>("runningTotal"));
 //       // action.setCellValueFactory(new PropertyValueFactory<>("action"));
         amount.setCellValueFactory(new PropertyValueFactory<>("total"));
+        amount.setCellFactory(tableColumn -> displayCurrency());
 //    
     }
 
@@ -708,6 +710,20 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         };
         return tableCell;
     }
+    
+    private TableCell<Invoices, BigDecimal> displayCurrency(){
+        TableCell<Invoices, BigDecimal> tableCell = new TableCell<Invoices, BigDecimal>(){
+            @Override
+            protected void updateItem(BigDecimal value, boolean empty){
+                super.updateItem(value, empty);
+                if (!empty) {
+                    setText(currency.format(value));
+                }
+            }
+        };
+    return tableCell;
+    }
+
 
     
     //to be revisited; conflicting cell editing due to two different input grids
