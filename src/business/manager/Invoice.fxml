@@ -236,17 +236,17 @@
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="457.0" prefWidth="582.0">
                            <children>
-                              <Pagination layoutX="200.0" layoutY="90.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
                               <AnchorPane layoutX="151.0" layoutY="91.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
                                  <children>
-                                    <TableView prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <Pagination fx:id="pagination" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0" />
+                                    <TableView fx:id="paginationTableView" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                       <columns>
-                                          <TableColumn prefWidth="98.0" text="Date" />
-                                          <TableColumn prefWidth="161.0" text="Invoice no." />
-                                          <TableColumn minWidth="0.0" prefWidth="186.0" text="Recipient" />
-                                        <TableColumn prefWidth="99.0" text="Status" />
-                                        <TableColumn prefWidth="125.0" text="Action" />
-                                          <TableColumn prefWidth="123.0" text="Amount" />
+                                          <TableColumn fx:id="dateCreated" prefWidth="98.0" text="Date" />
+                                          <TableColumn fx:id="invoiceNumber" prefWidth="161.0" text="Invoice no." />
+                                          <TableColumn fx:id="recipient" prefWidth="161.0" text="Recipient" />
+                                        <TableColumn fx:id="status" prefWidth="99.0" text="Status" />
+                                          <TableColumn fx:id="action" prefWidth="161.0" text="Action" />
+                                          <TableColumn fx:id="amount" prefWidth="123.0" text="Amount" />
                                       </columns>
                                     </TableView>
                                  </children>
