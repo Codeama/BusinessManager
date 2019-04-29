@@ -125,14 +125,14 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     
     //MANAGE INVOICES
     @FXML private Pagination pagination;
-    @FXML private TableView<Invoices> paginationTableView;
-    ObservableList<Invoices> invoiceList = FXCollections.observableArrayList();
-    @FXML private TableColumn<Invoices, Date> dateCreated;
-    @FXML private TableColumn<Invoices, String> invoiceNumber;
-    @FXML private TableColumn<Customers, String> recipient;
-    @FXML private TableColumn<Invoices, String> status;
-    @FXML private TableColumn<Invoices, String> action;
-    @FXML private TableColumn<Invoices, BigDecimal> amount;
+    @FXML private TableView<InvoicesDAOBean> paginationTableView;
+    ObservableList<InvoicesDAOBean> invoiceList = FXCollections.observableArrayList();
+    @FXML private TableColumn<InvoicesDAOBean, Date> dateCreated;
+    @FXML private TableColumn<InvoicesDAOBean, String> invoiceNumber;
+    @FXML private TableColumn<InvoicesDAOBean, String> recipient;
+    @FXML private TableColumn<InvoicesDAOBean, String> status;
+    @FXML private TableColumn<InvoicesDAOBean, String> action;
+    @FXML private TableColumn<InvoicesDAOBean, BigDecimal> amount;
     
     
     /**
@@ -201,23 +201,42 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
                     invoice.getCustomerId().getCustomerName(), invoice.getStatus(),
                     invoice.getFilePath(), invoice.getTotal() );
         });
+        
+        //copy data from JPA to FX Beans
+        getAllInvoices.getResultList().stream().forEach(invoice -> {
+            invoiceList.add(new InvoicesDAOBean(invoice.getDate(), 
+                    invoice.getInvoiceNo(), invoice.getCustomerId().getEmailAddress(),
+                    invoice.getStatus(), invoice.getTotal()));
+        });
+        
+        paginationTableView.setItems(invoiceList);
+        dateCreated.setCellValueFactory(cell -> cell.getValue().getDateProperty());
+        invoiceNumber.setCellValueFactory(cell -> cell.getValue().getInvoiceNoProperty());
+        recipient.setCellValueFactory(cell -> cell.getValue().getEmailAddressProperty());
+        status.setCellValueFactory(cell -> cell.getValue().getStatusProperty());
+        amount.setCellValueFactory(cell -> cell.getValue().getTotalProperty());
+        
     
 //        paginationTableView.setItems(invoiceList);
 //        paginationTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         
-        invoiceList.addAll(getAllInvoices.getResultList());
-        paginationTableView.setItems(invoiceList);
-        dateCreated.setCellValueFactory(new PropertyValueFactory<>("date"));
-        invoiceNumber.setCellValueFactory(new PropertyValueFactory<>("invoiceNo"));
-        status.setCellValueFactory(new PropertyValueFactory<>("status"));
-        dateCreated.setCellFactory(tableColumn -> dateFormat());
+
         
+        //invoiceList.addAll(getAllInvoices.getResultList());
+//        paginationTableView.setItems(invoiceList);
+//        dateCreated.setCellValueFactory(new PropertyValueFactory<>("date"));
+//        invoiceNumber.setCellValueFactory(new PropertyValueFactory<>("invoiceNo"));
+//        status.setCellValueFactory(new PropertyValueFactory<>("status"));
+//        dateCreated.setCellFactory(tableColumn -> dateFormat());
+//        //recipient.setCellValueFactory(new PropertyValueFactory<>("customerId"));
+        //recipient.setCellValueFactory(cell-> cell.getValue().getEmailAddress());
+
         //recipient.setCellValueFactory(new PropertyValueFactory<>("customerId"));
         //status.setCellValueFactory(new PropertyValueFactory<>("runningTotal"));
 //       // action.setCellValueFactory(new PropertyValueFactory<>("action"));
-        amount.setCellValueFactory(new PropertyValueFactory<>("total"));
-        amount.setCellFactory(tableColumn -> displayCurrency());
+//        amount.setCellValueFactory(new PropertyValueFactory<>("total"));
+//        amount.setCellFactory(tableColumn -> displayCurrency());
 //    
     }
 
