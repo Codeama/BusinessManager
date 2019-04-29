@@ -3,7 +3,7 @@
  */
 
 .button{
-    -fx-background-color: #8B008B;
+    -fx-background-color: black;
     -fx-width: 200;
     -fx-height: 58;
     -fx-text-fill: white;
@@ -14,11 +14,11 @@
     -fx-label-padding: 5 0 0 0;
     -fx-padding: 0 0 0 50;
     -fx-border: none;
-    -fx-border-color: #8B008B;
+    -fx-border-color: black;
    
 }
 .button:hover{
-    -fx-background-color: #4F91D3;
+    -fx-background-color: grey;
 }
 
 #selectedButton{
@@ -55,11 +55,11 @@
 }
 
 #profile{
-    -fx-background-color: #8B008B;
+    -fx-background-color: #7e2455;
 }
 
 #navbar{
-    -fx-background-color: #8B008B;
+    -fx-background-color: black;
 }
 
 /*#home-grid{
