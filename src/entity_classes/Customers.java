@@ -6,9 +6,7 @@
 package entity_classes;
 
 import java.io.Serializable;
-import java.util.Collection;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,10 +14,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -36,7 +32,6 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Customers.findByAddressLine2", query = "SELECT c FROM Customers c WHERE c.addressLine2 = :addressLine2")
     , @NamedQuery(name = "Customers.findByPostCode", query = "SELECT c FROM Customers c WHERE c.postCode = :postCode")
     , @NamedQuery(name = "Customers.findByCity", query = "SELECT c FROM Customers c WHERE c.city = :city")
-    , @NamedQuery(name = "Customers.findByCounty", query = "SELECT c FROM Customers c WHERE c.county = :county")
     , @NamedQuery(name = "Customers.findByPhoneNumber", query = "SELECT c FROM Customers c WHERE c.phoneNumber = :phoneNumber")
     , @NamedQuery(name = "Customers.findByEmailAddress", query = "SELECT c FROM Customers c WHERE c.emailAddress = :emailAddress")})
 public class Customers implements Serializable {
@@ -58,16 +53,11 @@ public class Customers implements Serializable {
     private String postCode;
     @Column(name = "CITY")
     private String city;
-    @Column(name = "COUNTY")
-    private String county;
     @Column(name = "PHONE_NUMBER")
     private Short phoneNumber;
+    @Basic(optional = false)
     @Column(name = "EMAIL_ADDRESS")
     private String emailAddress;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "customerId")
-    private Collection<InvoiceItems> invoiceItemsCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "customerId")
-    private Collection<Invoices> invoicesCollection;
 
     public Customers() {
     }
@@ -76,9 +66,10 @@ public class Customers implements Serializable {
         this.customerId = customerId;
     }
 
-    public Customers(Integer customerId, String customerName) {
+    public Customers(Integer customerId, String customerName, String emailAddress) {
         this.customerId = customerId;
         this.customerName = customerName;
+        this.emailAddress = emailAddress;
     }
 
     public Integer getCustomerId() {
@@ -129,14 +120,6 @@ public class Customers implements Serializable {
         this.city = city;
     }
 
-    public String getCounty() {
-        return county;
-    }
-
-    public void setCounty(String county) {
-        this.county = county;
-    }
-
     public Short getPhoneNumber() {
         return phoneNumber;
     }
@@ -151,24 +134,6 @@ public class Customers implements Serializable {
 
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
-    }
-
-    @XmlTransient
-    public Collection<InvoiceItems> getInvoiceItemsCollection() {
-        return invoiceItemsCollection;
-    }
-
-    public void setInvoiceItemsCollection(Collection<InvoiceItems> invoiceItemsCollection) {
-        this.invoiceItemsCollection = invoiceItemsCollection;
-    }
-
-    @XmlTransient
-    public Collection<Invoices> getInvoicesCollection() {
-        return invoicesCollection;
-    }
-
-    public void setInvoicesCollection(Collection<Invoices> invoicesCollection) {
-        this.invoicesCollection = invoicesCollection;
     }
 
     @Override
