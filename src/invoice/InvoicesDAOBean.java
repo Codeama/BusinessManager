@@ -25,15 +25,16 @@ public class InvoicesDAOBean {
     //private SimpleIntegerProperty id;
     private SimpleStringProperty invoiceNo;
     private SimpleObjectProperty<Customers> customerId;
+    private SimpleStringProperty emailAddress;
     
-    
-    public InvoicesDAOBean(Date date, String status, BigDecimal total, 
-            String invoiceNo, Customers customerId) {
+    public InvoicesDAOBean(Date date, String invoiceNo, String emailAddress, 
+             String status, BigDecimal total) {
         this.date = new SimpleObjectProperty(date);
         this.status = new SimpleStringProperty(status);
         this.total = new SimpleObjectProperty(total);
         this.invoiceNo = new SimpleStringProperty(invoiceNo);
-        this.customerId = new SimpleObjectProperty(customerId);
+        this.emailAddress = new SimpleStringProperty(emailAddress);
+        //this.customerId = new SimpleObjectProperty(customerId);
     }
     
     
@@ -86,6 +87,18 @@ public class InvoicesDAOBean {
 
     public void setInvoiceNo(String invoiceNo) {
         this.invoiceNo.set(invoiceNo);
+    }
+
+    public String getEmailAddress() {
+        return emailAddress.get();
+    }
+    
+    public SimpleStringProperty getEmailAddressProperty() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress.set(emailAddress);
     }
 
     public Customers getCustomerId() {
