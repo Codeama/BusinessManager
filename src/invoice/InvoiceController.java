@@ -131,8 +131,10 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     @FXML private TableColumn<InvoicesDAOBean, String> invoiceNumber;
     @FXML private TableColumn<InvoicesDAOBean, String> recipient;
     @FXML private TableColumn<InvoicesDAOBean, String> status;
-    @FXML private TableColumn<InvoicesDAOBean, String> action;
+    @FXML private TableColumn<ComboBoxBean, ComboBox> action;
     @FXML private TableColumn<InvoicesDAOBean, BigDecimal> amount;
+    ObservableList<ComboBoxBean> sentInvoiceList = FXCollections.observableArrayList();
+    
     
     
     /**
@@ -216,6 +218,15 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         status.setCellValueFactory(cell -> cell.getValue().getStatusProperty());
         amount.setCellValueFactory(cell -> cell.getValue().getTotalProperty());
         
+        ComboBox<String> sentInvoiceCombo = new ComboBox<>();
+        sentInvoiceCombo.getItems().add("Record Payment");
+        sentInvoiceCombo.getItems().add("PDF");
+        sentInvoiceCombo.getItems().add("Print");
+        
+        //add combo to ObseverbleList
+        sentInvoiceList.add(new ComboBoxBean(sentInvoiceCombo));
+        //add to tableView column
+        //action.setCellValueFactory(new PropertyValueFactory<>("actions"));
     
 //        paginationTableView.setItems(invoiceList);
 //        paginationTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
