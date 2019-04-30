@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.control.ComboBox;
 
 /**
  *
@@ -26,14 +27,16 @@ public class InvoicesDAOBean {
     private SimpleStringProperty invoiceNo;
     private SimpleObjectProperty<Customers> customerId;
     private SimpleStringProperty emailAddress;
+    private SimpleObjectProperty<ComboBox<String>> actions;
     
     public InvoicesDAOBean(Date date, String invoiceNo, String emailAddress, 
-             String status, BigDecimal total) {
+             String status, BigDecimal total, ComboBox<String> actions) {
         this.date = new SimpleObjectProperty(date);
         this.status = new SimpleStringProperty(status);
         this.total = new SimpleObjectProperty(total);
         this.invoiceNo = new SimpleStringProperty(invoiceNo);
         this.emailAddress = new SimpleStringProperty(emailAddress);
+        this.actions = new SimpleObjectProperty(actions);
         //this.customerId = new SimpleObjectProperty(customerId);
     }
     
@@ -111,6 +114,18 @@ public class InvoicesDAOBean {
     
     public SimpleObjectProperty getCustomerIdProperty() {
         return customerId;
+    }
+    
+    public ComboBox<String> getActions() {
+        return actions.get();
+    }
+    
+    public SimpleObjectProperty getActionsProperty() {
+        return actions;
+    }
+
+    public void setActions(ComboBox<String> actions) {
+        this.actions.set(actions);
     }
     
 

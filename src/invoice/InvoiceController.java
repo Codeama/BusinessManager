@@ -45,30 +45,14 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
 
     ScreenHandler screenController;
     ScreenHandler invoiceGridController = new ScreenHandler();
-    @FXML
-    private TextField clientName;
-
-    @FXML
-    private TextField clientAddress;
-
-    @FXML
-    private TextField clientCity;
-
-    @FXML
-    private TextField clientPostCode;
-    
-    @FXML
-    private TextField clientEmail;
-
-    @FXML
-    private TextField invoiceNo;
-
-    @FXML
-    private DatePicker invoiceDate;
-
-    @FXML
-    private DatePicker invoiceDueDate;
-    
+    @FXML private TextField clientName;
+    @FXML private TextField clientAddress;
+    @FXML private TextField clientCity;
+    @FXML private TextField clientPostCode;
+    @FXML private TextField clientEmail;
+    @FXML private TextField invoiceNo;
+    @FXML private DatePicker invoiceDate;
+    @FXML private DatePicker invoiceDueDate;
     @FXML private StackPane formStack;
     @FXML private GridPane flatRateForm;
     @FXML private GridPane unitRateForm;
@@ -131,9 +115,9 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     @FXML private TableColumn<InvoicesDAOBean, String> invoiceNumber;
     @FXML private TableColumn<InvoicesDAOBean, String> recipient;
     @FXML private TableColumn<InvoicesDAOBean, String> status;
-    @FXML private TableColumn<ComboBoxBean, ComboBox> action;
+    @FXML private TableColumn<InvoicesDAOBean, ComboBox<String>> action;
     @FXML private TableColumn<InvoicesDAOBean, BigDecimal> amount;
-    ObservableList<ComboBoxBean> sentInvoiceList = FXCollections.observableArrayList();
+    //ObservableList<ComboBoxBean> sentInvoiceList = FXCollections.observableArrayList();
     
     
     
@@ -204,11 +188,18 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
                     invoice.getFilePath(), invoice.getTotal() );
         });
         
+         ObservableList<String> sentInvoiceItems = 
+            FXCollections.observableArrayList(
+            "Record Payment", "PDF", "Print");
+        ComboBox<String> sentInvoiceCombo = new ComboBox<>();
+        sentInvoiceCombo.setItems(sentInvoiceItems);
+
         //copy data from JPA to FX Beans
         getAllInvoices.getResultList().stream().forEach(invoice -> {
             invoiceList.add(new InvoicesDAOBean(invoice.getDate(), 
                     invoice.getInvoiceNo(), invoice.getCustomerId().getEmailAddress(),
-                    invoice.getStatus(), invoice.getTotal()));
+                    invoice.getStatus(), invoice.getTotal(), new ComboBox<String>(sentInvoiceItems)));//add a NEW combobox for each data item
+                                                                                //consider creating new ComboBox for each
         });
         
         paginationTableView.setItems(invoiceList);
@@ -217,16 +208,13 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         recipient.setCellValueFactory(cell -> cell.getValue().getEmailAddressProperty());
         status.setCellValueFactory(cell -> cell.getValue().getStatusProperty());
         amount.setCellValueFactory(cell -> cell.getValue().getTotalProperty());
+        //action.setCellValueFactory(cell -> cell.getValue().getActionsProperty());
         
-        ComboBox<String> sentInvoiceCombo = new ComboBox<>();
-        sentInvoiceCombo.getItems().add("Record Payment");
-        sentInvoiceCombo.getItems().add("PDF");
-        sentInvoiceCombo.getItems().add("Print");
         
         //add combo to ObseverbleList
-        sentInvoiceList.add(new ComboBoxBean(sentInvoiceCombo));
+        //sentInvoiceList.add(new ComboBoxBean(sentInvoiceCombo));
         //add to tableView column
-        //action.setCellValueFactory(new PropertyValueFactory<>("actions"));
+        action.setCellValueFactory(new PropertyValueFactory<>("actions"));
     
 //        paginationTableView.setItems(invoiceList);
 //        paginationTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
