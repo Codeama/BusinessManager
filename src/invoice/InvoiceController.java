@@ -36,6 +36,9 @@ import org.controlsfx.control.textfield.TextFields;
 import com.bukola.*; //Tax Calculator API
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import javafx.scene.Node;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 /**
  * FXML Controller class
  *
@@ -109,7 +112,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     
     //MANAGE INVOICES
     @FXML private Pagination pagination;
-    @FXML private TableView<InvoicesDAOBean> paginationTableView;
+    @FXML TableView<InvoicesDAOBean> paginationTableView;
     ObservableList<InvoicesDAOBean> invoiceList = FXCollections.observableArrayList();
     @FXML private TableColumn<InvoicesDAOBean, Date> dateCreated;
     @FXML private TableColumn<InvoicesDAOBean, String> invoiceNumber;
@@ -117,10 +120,6 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     @FXML private TableColumn<InvoicesDAOBean, String> status;
     @FXML private TableColumn<InvoicesDAOBean, ComboBox<String>> action;
     @FXML private TableColumn<InvoicesDAOBean, BigDecimal> amount;
-    //ObservableList<ComboBoxBean> sentInvoiceList = FXCollections.observableArrayList();
-    
-    
-    
     /**
      * Initializes the controller class.
      */
@@ -188,6 +187,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
                     invoice.getFilePath(), invoice.getTotal() );
         });
         
+        
          ObservableList<String> sentInvoiceItems = 
             FXCollections.observableArrayList(
             "Record Payment", "PDF", "Print");
@@ -208,37 +208,11 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         recipient.setCellValueFactory(cell -> cell.getValue().getEmailAddressProperty());
         status.setCellValueFactory(cell -> cell.getValue().getStatusProperty());
         amount.setCellValueFactory(cell -> cell.getValue().getTotalProperty());
-        //action.setCellValueFactory(cell -> cell.getValue().getActionsProperty());
-        
-        
-        //add combo to ObseverbleList
-        //sentInvoiceList.add(new ComboBoxBean(sentInvoiceCombo));
-        //add to tableView column
-        action.setCellValueFactory(new PropertyValueFactory<>("actions"));
-    
-//        paginationTableView.setItems(invoiceList);
-//        paginationTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        
-
-        
-        //invoiceList.addAll(getAllInvoices.getResultList());
-//        paginationTableView.setItems(invoiceList);
-//        dateCreated.setCellValueFactory(new PropertyValueFactory<>("date"));
-//        invoiceNumber.setCellValueFactory(new PropertyValueFactory<>("invoiceNo"));
-//        status.setCellValueFactory(new PropertyValueFactory<>("status"));
-//        dateCreated.setCellFactory(tableColumn -> dateFormat());
-//        //recipient.setCellValueFactory(new PropertyValueFactory<>("customerId"));
-        //recipient.setCellValueFactory(cell-> cell.getValue().getEmailAddress());
-
-        //recipient.setCellValueFactory(new PropertyValueFactory<>("customerId"));
-        //status.setCellValueFactory(new PropertyValueFactory<>("runningTotal"));
-//       // action.setCellValueFactory(new PropertyValueFactory<>("action"));
-//        amount.setCellValueFactory(new PropertyValueFactory<>("total"));
-//        amount.setCellFactory(tableColumn -> displayCurrency());
-//    
+        action.setCellValueFactory(cell -> cell.getValue().getActionsProperty());
+        amount.setCellFactory(tableColumn -> displayCurrency());
+        dateCreated.setCellFactory(tableColumn -> dateFormat());
     }
-
+    
     
     private void switchForm(ObservableValue<? extends String>
             obsValue, String oldValue, String newValue){
@@ -715,8 +689,8 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     }
     
         //utility method for displaying currency symbol in tableView cells
-    private TableCell<Invoices, Date> dateFormat(){
-        TableCell<Invoices, Date> tableCell = new TableCell<Invoices, Date>(){
+    private TableCell<InvoicesDAOBean, Date> dateFormat(){
+        TableCell<InvoicesDAOBean, Date> tableCell = new TableCell<InvoicesDAOBean, Date>(){
             private SimpleDateFormat format = new SimpleDateFormat("dd MMM yyyy");
             @Override
             protected void updateItem(Date dateOnRecord, boolean empty){
@@ -729,8 +703,8 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         return tableCell;
     }
     
-    private TableCell<Invoices, BigDecimal> displayCurrency(){
-        TableCell<Invoices, BigDecimal> tableCell = new TableCell<Invoices, BigDecimal>(){
+    private TableCell<InvoicesDAOBean, BigDecimal> displayCurrency(){
+        TableCell<InvoicesDAOBean, BigDecimal> tableCell = new TableCell<InvoicesDAOBean, BigDecimal>(){
             @Override
             protected void updateItem(BigDecimal value, boolean empty){
                 super.updateItem(value, empty);
@@ -750,5 +724,6 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
 //        FlatRateBean invoiceContent = tableView.getSelectionModel().getSelectedItem();
 //        invoiceContent.setDescription(description.getNewValue());
 //    }
+
     
 }
