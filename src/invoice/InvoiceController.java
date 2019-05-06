@@ -36,9 +36,7 @@ import org.controlsfx.control.textfield.TextFields;
 import com.bukola.*; //Tax Calculator API
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javafx.scene.Node;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
+import javafx.stage.StageStyle;
 /**
  * FXML Controller class
  *
@@ -146,8 +144,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         flatRateComboBox.getSelectionModel().select("flat rate");
             //******observe selection changes*****
         flatRateComboBox.getSelectionModel().selectedItemProperty()
-                .addListener((obsValue, oldValue, newValue) -> 
-                        switchForm(obsValue, oldValue, newValue));            
+                .addListener(this::switchForm);            
 
             //*****ComboBox for Unit Rate Form****
         unitComboBox.setItems(unitComboItems);
@@ -155,8 +152,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         
             //****observe selection changes*******
         unitComboBox.getSelectionModel().selectedItemProperty()
-                .addListener((obsValue, oldValue, newValue) -> 
-                        switchForm(obsValue, oldValue, newValue));
+                .addListener(this::switchForm);
         
         
         //=====Description TextField editing mode====
@@ -171,11 +167,9 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
                 2, RoundingMode.HALF_UP))); 
 
         //=====for changes in Price TextField for Unit Rate Form===
-        unitPrice.textProperty().addListener((obv, oldValue, newValue) ->
-            computePriceChange(obv, oldValue, newValue));
+        unitPrice.textProperty().addListener(this::computePriceChange);
         //=====for changes in Quantity TextField for Unit Rate Form==
-        unitQuantity.textProperty().addListener((obv, oldValue, newValue)->
-            computeQuantityChange(obv, oldValue, newValue));
+        unitQuantity.textProperty().addListener(this::computeQuantityChange);
         
         //tableView editing mode (delete)
         //amountCol.setCellFactory(ButtonTableCell.forTableColumn());
@@ -198,7 +192,10 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         getAllInvoices.getResultList().stream().forEach(invoice -> {
             invoiceList.add(new InvoicesDAOBean(invoice.getDate(), 
                     invoice.getInvoiceNo(), invoice.getCustomerId().getEmailAddress(),
-                    invoice.getStatus(), invoice.getTotal(), new ComboBox<String>(sentInvoiceItems)));//add a NEW combobox for each data item
+                    invoice.getStatus(), invoice.getTotal(), new ComboBox<>(sentInvoiceItems)
+//                            .getSelectionModel().selectedItemProperty()
+//                            .addListener(this::changeInvoiceStatus)
+            ));//handle comboBox events
                                                                                 //consider creating new ComboBox for each
         });
         
@@ -714,6 +711,43 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             }
         };
     return tableCell;
+    }
+    
+    private void changeInvoiceStatus(ObservableValue<? extends String>
+            obsValue, String oldValue, String newValue){
+        if(newValue.equals("Record Payment")){
+            //show alert
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, 
+                    "Mark invoice as paid?", ButtonType.OK, ButtonType.CANCEL);
+            alert.setHeaderText(null);
+            alert.setTitle("Confirm Paid Invoice");
+            alert.initStyle(StageStyle.UTILITY);
+            
+            alert.showAndWait().ifPresent(response -> {
+                if(response == ButtonType.OK){
+                    //change Status to PAID, update record in database
+                    //first find selected invoice
+                    
+                    EntityTransaction transaction = entityManager.getTransaction();
+                    InvoicesDAOBean selectedInvoice = paginationTableView.getSelectionModel().getSelectedItem();
+                    System.out.println("Selected invoice no: " + selectedInvoice.getInvoiceNo());
+                    Invoices invoice = entityManager.find(Invoices.class, selectedInvoice.getInvoiceNo());
+                    invoice.setStatus("PAID");
+                    try{
+                    transaction.begin();
+                    entityManager.merge(invoice);
+                    transaction.commit(); // commit changes to the database
+                    displayAlert(AlertType.INFORMATION, "Entry Updated", 
+                    "Entry was successfully updated.");
+                    }catch(Exception e){
+                        transaction.rollback(); // undo database operations 
+                        displayAlert(AlertType.ERROR, "Entry Not Updated", 
+                        "Unable to update entry: " + e);
+                    }
+                    paginationTableView.refresh();
+                }
+            } );
+        }
     }
 
 
