@@ -28,6 +28,9 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Circle;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -43,6 +46,7 @@ import javax.persistence.TypedQuery;
 public class ExpensesController implements Initializable, ScreenChangeListener {
     
     ScreenHandler screenController;
+    @FXML private Circle expensesProfile;
     
     @FXML private DatePicker dateField;
 
@@ -101,8 +105,11 @@ public class ExpensesController implements Initializable, ScreenChangeListener {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        
+        expensesProfile.setFill(new ImagePattern(new Image(getClass().getResourceAsStream("profile.jpg"))));
         // TODO
         dateField.setValue(LocalDate.now());
+        
     }    
 
     @Override
