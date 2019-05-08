@@ -36,6 +36,9 @@ import org.controlsfx.control.textfield.TextFields;
 import com.bukola.*; //Tax Calculator API
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import javafx.scene.image.Image;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Circle;
 import javafx.stage.StageStyle;
 /**
  * FXML Controller class
@@ -46,6 +49,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
 
     ScreenHandler screenController;
     ScreenHandler invoiceGridController = new ScreenHandler();
+    @FXML Circle invoicesProfile;
     @FXML private TextField clientName;
     @FXML private TextField clientAddress;
     @FXML private TextField clientCity;
@@ -110,19 +114,27 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     
     //MANAGE INVOICES
     @FXML private Pagination pagination;
-    @FXML TableView<InvoicesDAOBean> paginationTableView;
-    ObservableList<InvoicesDAOBean> invoiceList = FXCollections.observableArrayList();
-    @FXML private TableColumn<InvoicesDAOBean, Date> dateCreated;
-    @FXML private TableColumn<InvoicesDAOBean, String> invoiceNumber;
-    @FXML private TableColumn<InvoicesDAOBean, String> recipient;
-    @FXML private TableColumn<InvoicesDAOBean, String> status;
-    @FXML private TableColumn<InvoicesDAOBean, ComboBox<String>> action;
-    @FXML private TableColumn<InvoicesDAOBean, BigDecimal> amount;
+    @FXML TableView<InvoicesDAO> paginationTableView;
+    ObservableList<InvoicesDAO> invoiceList = FXCollections.observableArrayList();
+    @FXML private TableColumn<InvoicesDAO, Date> dateCreated;
+    @FXML private TableColumn<InvoicesDAO, String> invoiceNumber;
+    @FXML private TableColumn<InvoicesDAO, String> recipient;
+    @FXML private TableColumn<InvoicesDAO, String> status;
+    @FXML private TableColumn<InvoicesDAO, ComboBox<String>> action;
+    @FXML private TableColumn<InvoicesDAO, BigDecimal> amount;
+    @FXML private TableColumn<InvoicesDAO, BigDecimal> total;
+    ComboBox<String> sentInvoiceCombo;
+    
+    
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        //PROFILE PICTURE
+        invoicesProfile.setFill(new ImagePattern(new Image(getClass().getResourceAsStream("profile.jpg"))));
+
+        
             //*****auto-complete recipient fields(Controlsfx)****
         if( findCustomerByName!= null){
         List<Customers> names = findCustomerByName.getResultList();
@@ -130,8 +142,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
                 .map(Customers::getCustomerName).collect(Collectors.toList()))
                 .setOnAutoCompleted(event -> autoCompleteRecipient());
         }
-        
-        
+
         
             //****auto-generate invoice number*********
         invoiceNo.setText("INV"+(currentDateTime()));
@@ -176,27 +187,30 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         
         //Print all invoices
         getAllInvoices.getResultList().stream().forEach((invoice) -> {
-            System.out.printf("%s\t%s\t%s\t%s\t%s\t%s%n", invoice.getDate(), invoice.getInvoiceNo(),
+            System.out.printf("%s\t%s\t%s\t%s\t%s\t%s\t%s%n", invoice.getDate(), invoice.getInvoiceNo(),
                     invoice.getCustomerId().getCustomerName(), invoice.getStatus(),
-                    invoice.getFilePath(), invoice.getTotal() );
+                    invoice.getFilePath(), invoice.getTotal(), invoice.getRunningTotal() );
         });
         
         
          ObservableList<String> sentInvoiceItems = 
             FXCollections.observableArrayList(
             "Record Payment", "PDF", "Print");
-        ComboBox<String> sentInvoiceCombo = new ComboBox<>();
-        sentInvoiceCombo.setItems(sentInvoiceItems);
+//        ComboBox<String> sentInvoiceCombo = new ComboBox<>();
+//        sentInvoiceCombo.setItems(sentInvoiceItems);
+//        sentInvoiceCombo.getSelectionModel().selectedItemProperty().addListener(this::changeInvoiceStatus);
 
         //copy data from JPA to FX Beans
         getAllInvoices.getResultList().stream().forEach(invoice -> {
-            invoiceList.add(new InvoicesDAOBean(invoice.getDate(), 
+            sentInvoiceCombo = new ComboBox<>();
+            sentInvoiceCombo.setItems(sentInvoiceItems);
+            sentInvoiceCombo.getSelectionModel().selectedItemProperty().addListener(this::changeInvoiceStatus);
+            invoiceList.add(new InvoicesDAO(invoice.getId(),invoice.getDate(), 
                     invoice.getInvoiceNo(), invoice.getCustomerId().getEmailAddress(),
-                    invoice.getStatus(), invoice.getTotal(), new ComboBox<>(sentInvoiceItems)
-//                            .getSelectionModel().selectedItemProperty()
-//                            .addListener(this::changeInvoiceStatus)
+                    invoice.getStatus(), invoice.getTotal(), invoice.getRunningTotal(),sentInvoiceCombo
             ));//handle comboBox events
-                                                                                //consider creating new ComboBox for each
+            //TableColumn<InvoicesDAOBean, ComboBox<String>> column = action.get
+            //Invoices invoice = action.getTableView();
         });
         
         paginationTableView.setItems(invoiceList);
@@ -205,8 +219,10 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         recipient.setCellValueFactory(cell -> cell.getValue().getEmailAddressProperty());
         status.setCellValueFactory(cell -> cell.getValue().getStatusProperty());
         amount.setCellValueFactory(cell -> cell.getValue().getTotalProperty());
+        total.setCellValueFactory(cell -> cell.getValue().getRunningTotalProperty());
         action.setCellValueFactory(cell -> cell.getValue().getActionsProperty());
         amount.setCellFactory(tableColumn -> displayCurrency());
+        total.setCellFactory(tableColumn -> displayCurrency());
         dateCreated.setCellFactory(tableColumn -> dateFormat());
     }
     
@@ -296,6 +312,13 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         unitTotal.setText(currency.format(BigDecimal.ZERO.setScale(
             2, RoundingMode.HALF_UP)));
 
+    }
+    
+    private void getPaidInvoices(){
+        TypedQuery<Invoices> getPaid = 
+            entityManager.createNamedQuery("Invoices.findByStatus", Invoices.class);
+        getPaid.setParameter("status", "PAID");
+        getPaid.getResultList().forEach(invoice -> System.out.println("Paid invoice : "+ invoice.getTotal()));
     }
 
     
@@ -493,7 +516,7 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         };
     return tableCell;
     }
-    /**
+    /**This method is useful for the Address Book interface (to be implemented)
      * To avoid duplicate email address and in sync with UNIQUE constraint
      * on the Email_Address column of the Customer table, 
      * this checks new email entry whether the email address already exists
@@ -535,7 +558,6 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     
 
     public Customers addNewCustomer(){
-       
         //get recipient details and save in customer table
         Customers customer = new Customers();
         customer.setCustomerName(clientName.getText());
@@ -580,6 +602,10 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         return dateString + timeString;
     }
     
+    /**
+     * Method to create invoice and persist data in the database. It also checks
+     *          and  validates invoice number is unique
+     */
     public void createInvoice(){
         //handle empty invoice when user clicks "create button"
         if(isInvoiceEmpty()){
@@ -595,55 +621,58 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
             invoiceNo.requestFocus();
         }
         else{
+            EntityTransaction transaction = entityManager.getTransaction();
+            Customers customer;
+            //checks if recipient detail is filled from Address book
+            //otherewise, records new customer
+            if(isAutoCompleted){customer = autoCustomer;}
+            else{customer = addNewCustomer();
+            }
+            entityManager.persist(customer);
 
-        EntityTransaction transaction = entityManager.getTransaction();
-        Customers customer;
-        //checks if recipient detail is filled from Address book
-        //otherewise, records new customer
-        if(isAutoCompleted){customer = autoCustomer;}
-        else{customer = addNewCustomer();}
-        
-        entityManager.persist(customer);
-        
-        //aggregate income with Tax_Calculator
-        Wages wageCalculator = new Wages(); 
-        if(getAllInvoices!=null){
-            List<Invoices> subTotal = getAllInvoices.getResultList();
-            subTotal.forEach(invoice -> {wageCalculator.addPay(invoice.getTotal());});
-        }
-        try{
-            saveAsPDF();
-            Invoices invoice = recordInvoiceDetails(customer); //invoice no., date, etc
-            //fetch last record's runningTotal
-            wageCalculator.addPay(invoice.getTotal());//add current invoice total to wageCalculator
-            invoice.setRunningTotal(wageCalculator.getTotalPayToDate()); //add up all invoices to date
-            entityManager.persist(invoice);
+            //calculate running total for each invoice entry using the Tax_Calculator API
+            Wages wageCalculator = new Wages();
+            TypedQuery<Invoices> getPaidInvoices = 
+                entityManager.createNamedQuery("Invoices.findByStatus", Invoices.class);
+            getPaidInvoices.setParameter("status", "PAID");
+
+            if(getAllInvoices!=null){
+                List<Invoices> subTotal = getAllInvoices.getResultList();
+                subTotal.forEach(invoice -> {wageCalculator.addPay(invoice.getTotal());});
+            }
+            try{
+                saveAsPDF();
+                Invoices invoice = recordInvoiceDetails(customer); //invoice no., date, etc
+                //fetch last record's runningTotal
+                wageCalculator.addPay(invoice.getTotal());//add current invoice total to wageCalculator
+                invoice.setRunningTotal(wageCalculator.getTotalPayToDate()); //add up all invoices to date
+                entityManager.persist(invoice);
 
 
-            ObservableList<RateBean> allItems = tableView.getItems();//
-            allItems.forEach(item ->{
-                InvoiceItems invoiceItem = new InvoiceItems();
-                invoiceItem.setInvoiceNo(invoiceNo.getText()); //FK
-                invoiceItem.setCustomerId(customer);
-                invoiceItem.setDescription(item.getDescription());
-                invoiceItem.setQuantity(item.getQuantity());
-                invoiceItem.setPrice(item.getPrice());
-                invoiceItem.setAmount(item.getTotal());
+                ObservableList<RateBean> allItems = tableView.getItems();//
+                allItems.forEach(item ->{
+                    InvoiceItems invoiceItem = new InvoiceItems();
+                    invoiceItem.setInvoiceNo(invoiceNo.getText()); 
+                    invoiceItem.setCustomerId(customer);
+                    invoiceItem.setDescription(item.getDescription());
+                    invoiceItem.setQuantity(item.getQuantity());
+                    invoiceItem.setPrice(item.getPrice());
+                    invoiceItem.setAmount(item.getTotal());
 
-                 entityManager.persist(invoiceItem);
+                     entityManager.persist(invoiceItem);
 
-                 transaction.begin();
-                 transaction.commit();
-            });
-            //entityManager.close();
+                     transaction.begin();
+                     transaction.commit();
+                });
+                //entityManager.close();
 
-            displayAlert(AlertType.INFORMATION, 
-                         "Invoice Status", 
-                         "Invoice created!");
-         }catch(Exception e){
-             displayAlert(AlertType.ERROR, "Create Invoice Failed", 
-            "Unable to create invoice: " + e);
-         }
+                displayAlert(AlertType.INFORMATION, 
+                             "Invoice Status", 
+                             "Invoice created!");
+             }catch(Exception e){
+                 displayAlert(AlertType.ERROR, "Create Invoice Failed", 
+                "Unable to create invoice: " + e);
+             }
         
        refreshPage();}
     }
@@ -660,20 +689,6 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         return invoice;
     }
     
-    //use for refactoring - utility method for createInvoice
-    private void recordInvoiceItems(Customers customer, Invoices invoice){
-        ObservableList<RateBean> allItems = tableView.getItems();
-        allItems.forEach(item ->{
-            InvoiceItems invoiceItem = new InvoiceItems();
-            invoiceItem.setInvoiceNo(invoiceNo.getText());
-            invoiceItem.setCustomerId(customer);
-            invoiceItem.setDescription(item.getDescription());
-            invoiceItem.setQuantity(item.getQuantity());
-            invoiceItem.setPrice(item.getPrice());
-            invoiceItem.setAmount(item.getTotal());
-        });
-    }
-    
     public void refreshPage(){
         clientName.clear();
         clientAddress.clear();
@@ -686,8 +701,8 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     }
     
         //utility method for displaying currency symbol in tableView cells
-    private TableCell<InvoicesDAOBean, Date> dateFormat(){
-        TableCell<InvoicesDAOBean, Date> tableCell = new TableCell<InvoicesDAOBean, Date>(){
+    private TableCell<InvoicesDAO, Date> dateFormat(){
+        TableCell<InvoicesDAO, Date> tableCell = new TableCell<InvoicesDAO, Date>(){
             private SimpleDateFormat format = new SimpleDateFormat("dd MMM yyyy");
             @Override
             protected void updateItem(Date dateOnRecord, boolean empty){
@@ -700,8 +715,8 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
         return tableCell;
     }
     
-    private TableCell<InvoicesDAOBean, BigDecimal> displayCurrency(){
-        TableCell<InvoicesDAOBean, BigDecimal> tableCell = new TableCell<InvoicesDAOBean, BigDecimal>(){
+    private TableCell<InvoicesDAO, BigDecimal> displayCurrency(){
+        TableCell<InvoicesDAO, BigDecimal> tableCell = new TableCell<InvoicesDAO, BigDecimal>(){
             @Override
             protected void updateItem(BigDecimal value, boolean empty){
                 super.updateItem(value, empty);
@@ -713,40 +728,57 @@ public class InvoiceController implements Initializable, ScreenChangeListener {
     return tableCell;
     }
     
+    /**
+     * method to listen to changes in the ComboBox column of the Manage Invoices column
+     *         and effect them accordingly. This only currently changes the status of an invoice to paid
+     *         User experience needs working on as the ComboBox changes do not currently work without 
+     *         a table row being highlighted. So any way to grab the value of a row from 
+     *         a ComboBox (column) should change this behaviour. Method use is in initialize.
+     * @param obsValue The value that is being observed for changes which is the initial state of the ComboBox item. 
+     *          This is currently null.
+     * @param oldValue The old value of the ComboBox item selected
+     * @param newValue  The new value that the user selects
+     */
     private void changeInvoiceStatus(ObservableValue<? extends String>
             obsValue, String oldValue, String newValue){
         if(newValue.equals("Record Payment")){
+            InvoicesDAO selectedInvoice = paginationTableView.getSelectionModel().getSelectedItem();
             //show alert
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, 
-                    "Mark invoice as paid?", ButtonType.OK, ButtonType.CANCEL);
-            alert.setHeaderText(null);
-            alert.setTitle("Confirm Paid Invoice");
-            alert.initStyle(StageStyle.UTILITY);
-            
-            alert.showAndWait().ifPresent(response -> {
-                if(response == ButtonType.OK){
-                    //change Status to PAID, update record in database
-                    //first find selected invoice
-                    
-                    EntityTransaction transaction = entityManager.getTransaction();
-                    InvoicesDAOBean selectedInvoice = paginationTableView.getSelectionModel().getSelectedItem();
-                    System.out.println("Selected invoice no: " + selectedInvoice.getInvoiceNo());
-                    Invoices invoice = entityManager.find(Invoices.class, selectedInvoice.getInvoiceNo());
-                    invoice.setStatus("PAID");
-                    try{
-                    transaction.begin();
-                    entityManager.merge(invoice);
-                    transaction.commit(); // commit changes to the database
-                    displayAlert(AlertType.INFORMATION, "Entry Updated", 
-                    "Entry was successfully updated.");
-                    }catch(Exception e){
-                        transaction.rollback(); // undo database operations 
-                        displayAlert(AlertType.ERROR, "Entry Not Updated", 
-                        "Unable to update entry: " + e);
+            if(selectedInvoice != null){
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, 
+                        "Mark invoice " +selectedInvoice.getInvoiceNo()+ " as paid?", ButtonType.OK, ButtonType.CANCEL);
+                alert.setHeaderText(null);
+                alert.setTitle("Confirm Paid Invoice");
+                alert.initStyle(StageStyle.UTILITY);
+
+                alert.showAndWait().ifPresent(response -> {
+                    if(response == ButtonType.OK){
+                        //change Status to PAID, update record in database
+                        //first find selected invoice
+
+                        EntityTransaction transaction = entityManager.getTransaction();
+                        //sentInvoiceCombo.a
+    //                    InvoicesDAO selectedInvoice = paginationTableView.getSelectionModel().getSelectedItem();
+                        System.out.println("Selected invoice no: " + selectedInvoice.getId());
+                        Invoices invoice = entityManager.find(Invoices.class, selectedInvoice.getId());
+                        invoice.setStatus("PAID");
+                        System.out.println("Invoice number: "+ invoice);
+                        try{
+                        transaction.begin();
+                        entityManager.merge(invoice);
+                        transaction.commit(); // commit changes to the database
+                        displayAlert(AlertType.INFORMATION, "Entry Updated", 
+                        "Entry was successfully updated.");
+                        paginationTableView.refresh();
+                        }catch(Exception e){
+                            transaction.rollback(); // undo database operations 
+                            displayAlert(AlertType.ERROR, "Entry Not Updated", 
+                            "Unable to update entry: " + e);
+                        }
+
                     }
-                    paginationTableView.refresh();
-                }
-            } );
+                } );
+            }
         }
     }
 
