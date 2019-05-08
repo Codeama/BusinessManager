@@ -244,9 +244,10 @@
                                           <TableColumn fx:id="dateCreated" prefWidth="98.0" text="Date" />
                                           <TableColumn fx:id="invoiceNumber" prefWidth="161.0" text="Invoice no." />
                                           <TableColumn fx:id="recipient" prefWidth="161.0" text="Recipient" />
-                                        <TableColumn fx:id="status" prefWidth="99.0" text="Status" />
-                                          <TableColumn fx:id="action" prefWidth="161.0" text="Action" />
-                                          <TableColumn fx:id="amount" prefWidth="123.0" text="Amount" />
+                                        <TableColumn fx:id="status" prefWidth="89.0" text="Status" />
+                                          <TableColumn fx:id="action" prefWidth="108.0" text="Action" />
+                                          <TableColumn fx:id="amount" minWidth="20.0" prefWidth="85.0" text="Amount" />
+                                          <TableColumn fx:id="total" maxWidth="149.0" minWidth="20.0" prefWidth="97.0" text="Running Total" />
                                       </columns>
                                     </TableView>
                                  </children>
