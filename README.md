@@ -14,5 +14,8 @@ This is a database backed standalone Java application that can be used to create
 ### Invoicing
 ![image](https://user-images.githubusercontent.com/31381732/57479902-682dbe80-7296-11e9-928b-fa304d261634.png)
 
+#### Manage Invoices
+![image](https://user-images.githubusercontent.com/31381732/57485902-ccf01580-72a4-11e9-9ab6-e7a37f4f562b.png)
+
 ### Expenses
 ![image](https://user-images.githubusercontent.com/31381732/57480021-9b704d80-7296-11e9-9f62-8e2e9caf610d.png)
