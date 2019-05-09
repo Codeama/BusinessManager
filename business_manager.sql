@@ -1,6 +1,6 @@
 create table EXPENSES
 (
-	ATE DATE not null,
+	DATE DATE not null,
 	DESCRIPTION CHAR(100) not null,
 	CATEGORY CHAR(50),
 	RECEIPT VARCHAR(50),
