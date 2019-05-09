@@ -8,6 +8,7 @@ package home;
 import business.manager.BusinessManager;
 import business.manager.ScreenChangeListener;
 import business.manager.ScreenHandler;
+import com.bukola.Wages;
 import entity_classes.Expenses;
 import entity_classes.Invoices;
 import java.math.BigDecimal;
@@ -47,7 +48,7 @@ public class HomeController implements Initializable, ScreenChangeListener {
     private Label profitLabel;
      
      @FXML
-     private Circle homeProfile;
+     private Circle profileCircle;
      
      @FXML
      private ImageView imageView;
@@ -73,6 +74,12 @@ public class HomeController implements Initializable, ScreenChangeListener {
     private final TypedQuery<Expenses> getAllExpenses = 
             entityManager.createNamedQuery("Expenses.findAll", Expenses.class);
     
+    private final Wages wageCalculator = new Wages();
+    private final TypedQuery<Invoices> getPaidInvoices = 
+                entityManager.createNamedQuery("Invoices.findByStatus", Invoices.class);
+    //        getPaidInvoices.setParameter("status", "PAID");
+
+    
         
         
     /**
@@ -93,9 +100,8 @@ public class HomeController implements Initializable, ScreenChangeListener {
        queryAndDisplayProfits();
        
        //PROFILE IMAGE
-       //Image image = new Image("initial.png");
-       imageView.setImage(new Image(getClass().getResourceAsStream("initial.png")));
-       //homeProfile.setFill(new ImagePattern(new Image("initial.png")));
+       
+      profileCircle.setFill(new ImagePattern(new Image(getClass().getResourceAsStream("profile.jpg"))));
     }    
 
     @Override
@@ -157,5 +163,9 @@ public class HomeController implements Initializable, ScreenChangeListener {
         if(profits.getEarningsList() != null)
             profitLabel.setText(currency.format(profits.getTotalEarnings()));
     }
+    
+//    private void countWeeksToDate(){
+//        Query weeks = entityManager.createQuery("SELECT i FROM Invoices i WHERE i.date = FUNCTION('DATEDIFF', week ,'2019/04/06' , '2013/08/20')", Invoices.class);
+//    }
     
 }
