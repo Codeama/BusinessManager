@@ -87,6 +87,8 @@ public class HomeController implements Initializable, ScreenChangeListener {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        
+        
         //INCOME
         queryAndDisplayIncome();
        
@@ -163,9 +165,5 @@ public class HomeController implements Initializable, ScreenChangeListener {
         if(profits.getEarningsList() != null)
             profitLabel.setText(currency.format(profits.getTotalEarnings()));
     }
-    
-//    private void countWeeksToDate(){
-//        Query weeks = entityManager.createQuery("SELECT i FROM Invoices i WHERE i.date = FUNCTION('DATEDIFF', week ,'2019/04/06' , '2013/08/20')", Invoices.class);
-//    }
     
 }
