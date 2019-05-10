@@ -18,8 +18,9 @@ create table INVOICES
 	STATUS CHAR(10) not null,
 	TOTAL DECIMAL(10) not null,
 	RUNNING_TOTAL DECIMAL(10) not null,
-	INVOICE_NO VARCHAR(25) not null,
-	ID INTEGER default AUTOINCREMENT: start 1 increment 1 not null primary key
+	INVOICE_NO VARCHAR(25) unique not null,
+	ID INTEGER default AUTOINCREMENT: start 1 increment 1 not null primary key,
+	FOREIGN KEY (CUSTOMER_ID) REFERENCES CUSTOMERS (CUSTOMER_ID)
 )
 
 create table CUSTOMERS
@@ -31,7 +32,7 @@ create table CUSTOMERS
 	POST_CODE VARCHAR(15),
 	CITY VARCHAR(30),
 	PHONE_NUMBER SMALLINT,
-	EMAIL_ADDRESS VARCHAR(60) default '' not null
+	EMAIL_ADDRESS VARCHAR(60) unique not null
 )
 
 
@@ -57,5 +58,6 @@ create table INVOICE_ITEMS
 	DESCRIPTION VARCHAR(50),
 	PRICE DECIMAL(10) not null,
 	AMOUNT DECIMAL(10) not null,
-	QUANTITY DECIMAL(5)
+	QUANTITY DECIMAL(5),
+	FOREIGN KEY (INVOICE_NO) REFERENCES INVOICES (INVOICE_NO)
 )
