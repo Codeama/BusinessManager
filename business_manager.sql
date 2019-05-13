@@ -52,7 +52,7 @@ create table TAX
 
 create table INVOICE_ITEMS
 (
-    ITEM_NO INTEGER default AUTOINCREMENT: start 1 increment 1 not null primary key,
+    	ITEM_NO INTEGER default AUTOINCREMENT: start 1 increment 1 not null primary key,
 	INVOICE_NO VARCHAR(25) not null,
 	CUSTOMER_ID INTEGER not null,
 	DESCRIPTION VARCHAR(50),
