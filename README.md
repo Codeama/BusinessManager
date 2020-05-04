@@ -1,4 +1,4 @@
-*Quick Note*
+_**Quick Note**_. 
 This is an unfinished project but nonetheless an interesting one that I embarked on when I first learned to program with Java.
 Feel free to clone, fork or copy this, but do bear in mind that it needs a database connection code. The joys of using an IDE like Netbeans meant I didn't have to write connection code at the time to get this working to use the JPA. But you'll need one for portability. If you're still learning and you need help with or are stuck writing the connection code, feel free to send me a message and I'll try and help.
 Happy coding!
